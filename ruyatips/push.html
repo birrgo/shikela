@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Save ID & Send Push</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK (Required to save the ID to your database) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans p-6">
+
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-blue-900 mb-6 border-b pb-2">Admin Dashboard: Send Push & Save ID</h2>
+        
+        <form id="adminForm" class="space-y-6">
+            
+            <!-- Notification Details -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">1. Notification Details</h3>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Push Title</label>
+                    <input type="text" id="newsTitle" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-1">Push Message / Content</label>
+                    <textarea id="content" rows="3" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-1">Image URL (Optional)</label>
+                    <input type="url" id="imageUrl" class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/image.jpg">
+                </div>
+            </div>
+
+            <!-- OneSignal Credentials -->
+            <div class="bg-blue-50 p-4 rounded border border-blue-100">
+                <h3 class="text-lg font-semibold text-blue-900 mb-3">2. Push Notification Setup (OneSignal)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">OneSignal App ID (Will be saved to DB)</label>
+                        <input type="text" id="osAppId" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">OneSignal REST API Key</label>
+                        <input type="password" id="osRestKey" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">*Keys are saved locally in your browser.</p>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition duration-200">
+                Save App ID to Database & Send Push
+            </button>
+            
+            <div id="statusMessage" class="hidden mt-4 p-3 rounded font-medium text-center"></div>
+        </form>
+    </div>
+
+    <script>
+        // 1. Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqwgwiukwKb7o6gwnaLoPQSWc7BfMDuYQ",
+            authDomain: "besuad.firebaseapp.com",
+            databaseURL: "https://besuad-default-rtdb.firebaseio.com",
+            projectId: "besuad",
+            storageBucket: "besuad.firebasestorage.app",
+            messagingSenderId: "641705823615",
+            appId: "1:641705823615:web:6502b2511ff8c0f251de4a",
+            measurementId: "G-2YSX71N08Q"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Load saved OneSignal keys from localStorage
+        document.getElementById('osAppId').value = localStorage.getItem('osAppId') || '';
+        document.getElementById('osRestKey').value = localStorage.getItem('osRestKey') || '';
+
+        const statusDiv = document.getElementById('statusMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showStatus(message, isError = false) {
+            statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+            statusDiv.classList.add(isError ? 'bg-red-100' : 'bg-green-100');
+            statusDiv.classList.add(isError ? 'text-red-800' : 'text-green-800');
+            statusDiv.innerText = message;
+        }
+
+        // Handle Form Submission
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing...";
+
+            // Gather values
+            const title = document.getElementById('newsTitle').value;
+            const content = document.getElementById('content').value;
+            const imageUrl = document.getElementById('imageUrl').value;
+            
+            const osAppId = document.getElementById('osAppId').value;
+            const osRestKey = document.getElementById('osRestKey').value;
+
+            // Save keys for next time locally
+            localStorage.setItem('osAppId', osAppId);
+            localStorage.setItem('osRestKey', osRestKey);
+
+            try {
+                // STEP 1: Save the App ID to Firebase so the main app can read it
+                await db.ref('app7/oneSignal/appId').set(osAppId);
+
+                // STEP 2: Send OneSignal Push Notification
+                const osResponse = await fetch("https://onesignal.com/api/v1/notifications", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json; charset=utf-8",
+                        "Authorization": `Basic ${osRestKey}`
+                    },
+                    body: JSON.stringify({
+                        app_id: osAppId,
+                        included_segments: ["Subscribed Users"],
+                        headings: { "en": title },
+                        contents: { "en": content },
+                        big_picture: imageUrl || ""
+                    })
+                });
+
+                const osResult = await osResponse.json();
+
+                if (osResponse.ok && osResult.id) {
+                    showStatus("Success! App ID saved to Firebase AND Push Notification sent.");
+                    document.getElementById('adminForm').reset();
+                    // Restore keys since reset clears them
+                    document.getElementById('osAppId').value = osAppId;
+                    document.getElementById('osRestKey').value = osRestKey;
+                } else {
+                    console.error(osResult);
+                    showStatus(`App ID saved, but OneSignal failed: ${osResult.errors ? osResult.errors.join(', ') : 'Unknown error'}`, true);
+                }
+
+            } catch (error) {
+                console.error(error);
+                showStatus(`Error: ${error.message}`, true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Save App ID to Database & Send Push";
+            }
+        });
+    </script>
+</body>
+</html>

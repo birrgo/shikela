@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Yala Tech - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F7F9FC;
+            --surface-color: #FFFFFF;
+            --text-main: #111827;
+            --text-soft: #6B7280;
+            --primary: #3B82F6;
+            --primary-hover: #2563EB;
+            --primary-light: #EFF6FF;
+            --border-color: #E5E7EB;
+            --input-bg: #F9FAFB;
+            --success: #10B981;
+            --danger: #EF4444;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px 16px;
+            background-image: 
+                radial-gradient(at 10% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 90% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .dashboard-wrapper {
+            width: 100%;
+            max-width: 440px;
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .avatar-placeholder {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 16px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-soft);
+            font-weight: 500;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-wrapper label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .custom-input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .custom-input:focus {
+            background: var(--surface-color);
+            border-color: var(--primary);
+        }
+
+        .pin-input {
+            text-align: center;
+            letter-spacing: 8px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .primary-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .primary-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .primary-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .dialog-box {
+            background: var(--surface-color);
+            width: 100%;
+            max-width: 340px;
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            text-align: center;
+        }
+        .dialog-icon {
+            width: 56px; height: 56px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; margin: 0 auto 16px;
+        }
+        .dialog-icon.error { background: #FEE2E2; color: var(--danger); }
+        .dialog-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .dialog-desc { font-size: 14px; color: var(--text-soft); margin-bottom: 24px; }
+        .dialog-btn {
+            background: var(--input-bg); border: none; width: 100%;
+            padding: 14px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <header class="header-section">
+            <div class="avatar-placeholder">💻</div>
+            <h1 class="title">Yala Tech</h1>
+            <p class="subtitle">Please log in to manage your content.</p>
+        </header>
+
+        <div id="loginView">
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <label>Your Name</label>
+                    <input type="text" id="loginName" class="custom-input" placeholder="e.g. Admin" autocomplete="off">
+                </div>
+                <div class="input-wrapper">
+                    <label>Access PIN</label>
+                    <input type="password" id="loginPin" class="custom-input pin-input" maxlength="8" placeholder="••••" autocomplete="off">
+                </div>
+            </div>
+            <button class="primary-btn" id="loginBtn" onclick="handleLogin()">Sign In</button>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="friendlyModal" class="modal-overlay">
+        <div class="dialog-box">
+            <div id="dialogIcon" class="dialog-icon error">!</div>
+            <h3 id="dialogTitle" class="dialog-title">Title</h3>
+            <p id="dialogDesc" class="dialog-desc">Description goes here.</p>
+            <button class="dialog-btn" onclick="closeDialog()">Got it</button>
+        </div>
+    </div>
+
+    <script>
+        const APP_NODE = "app10";
+        const DEFAULT_PIN = "1234";
+        const DEFAULT_USER = "Netsa Pro Admin";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqwgwiukwKb7o6gwnaLoPQSWc7BfMDuYQ",
+            authDomain: "besuad.firebaseapp.com",
+            databaseURL: "https://besuad-default-rtdb.firebaseio.com",
+            projectId: "besuad",
+            storageBucket: "besuad.firebasestorage.app",
+            messagingSenderId: "641705823615",
+            appId: "1:641705823615:web:6502b2511ff8c0f251de4a",
+            measurementId: "G-2YSX71N08Q"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function showDialog(title, message) {
+            document.getElementById('dialogTitle').innerText = title;
+            document.getElementById('dialogDesc').innerText = message;
+            document.getElementById('friendlyModal').classList.add('show');
+        }
+
+        function closeDialog() {
+            document.getElementById('friendlyModal').classList.remove('show');
+        }
+
+        async function handleLogin() {
+            const nameInput = document.getElementById('loginName').value.trim();
+            const pinInput = document.getElementById('loginPin').value.trim();
+            const btn = document.getElementById('loginBtn');
+
+            if (!nameInput || !pinInput) {
+                showDialog('Missing info', 'Please enter both your name and PIN to continue.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Checking...";
+
+            try {
+                const pinSnap = await db.ref(`${APP_NODE}/adminPin`).once('value');
+                const userSnap = await db.ref(`${APP_NODE}/adminUsername`).once('value');
+
+                let dbPin = pinSnap.val() || DEFAULT_PIN;
+                let dbUser = userSnap.val() || DEFAULT_USER;
+
+                if (!pinSnap.exists()) await db.ref(`${APP_NODE}/adminPin`).set(DEFAULT_PIN);
+                if (!userSnap.exists()) await db.ref(`${APP_NODE}/adminUsername`).set(DEFAULT_USER);
+
+                if (nameInput.toLowerCase() === dbUser.toLowerCase() && pinInput === dbPin.toString()) {
+                    // Save login state and redirect to dashboard
+                    sessionStorage.setItem('bekaAuth', 'true');
+                    sessionStorage.setItem('bekaUser', dbUser);
+                    window.location.href = 'new.html';
+                } else {
+                    showDialog('Oops!', 'That name or PIN doesn\'t match our records.');
+                    document.getElementById('loginPin').value = "";
+                }
+            } catch (err) {
+                console.error(err);
+                showDialog('Connection issue', 'We couldn\'t connect to the database right now.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Sign In";
+            }
+        }
+
+        document.getElementById('loginPin').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+        document.getElementById('loginName').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('loginPin').focus(); });
+    </script>
+</body>
+</html>

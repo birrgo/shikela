@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Yala Tech - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            var(--bg-color): #F1F5F9; --surface-color: #FFFFFF; --text-main: #0F172A; --text-soft: #64748B;
+            --primary: #2563EB; --primary-hover: #1D4ED8;
+            --card-bg: #1E293B; --card-hover: #0F172A; --card-text: #F8FAFC; --card-text-soft: #94A3B8;
+            --border-color: #E2E8F0; --danger: #DC2626;
+            --radius-lg: 20px; --radius-md: 12px; --radius-sm: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: #F1F5F9; color: var(--text-main);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 24px 16px;
+        }
+
+        .dashboard-wrapper {
+            width: 100%; max-width: 440px; background: var(--surface-color);
+            border-radius: var(--radius-lg); padding: 36px 32px;
+            box-shadow: var(--shadow-lg); border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .header-section { text-align: center; margin-bottom: 32px; }
+        
+        .avatar-placeholder {
+            width: 64px; height: 64px; background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+            color: var(--primary); border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; font-size: 28px; margin: 0 auto 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .title { font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .subtitle { font-size: 14px; color: var(--text-soft); font-weight: 500; }
+        
+        .user-greeting {
+            display: inline-block; margin-top: 14px; padding: 6px 14px;
+            background: #F1F5F9; border: 1px solid var(--border-color);
+            border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--text-soft);
+        }
+
+        .module-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+        .action-card {
+            background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md); padding: 20px; text-decoration: none;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: var(--shadow-md); transition: all 0.2s ease;
+        }
+        .action-card:hover {
+            background: var(--card-hover); transform: translateY(-2px);
+            box-shadow: var(--shadow-lg); border-color: rgba(255, 255, 255, 0.1);
+        }
+        .action-card:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+        
+        .card-icon {
+            font-size: 22px; background: rgba(255, 255, 255, 0.1); color: #FFF;
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; flex-shrink: 0;
+        }
+        
+        .card-text { flex: 1; }
+        .card-text h3 { font-size: 15px; font-weight: 600; color: var(--card-text); margin-bottom: 4px; }
+        .card-text p { font-size: 13px; color: var(--card-text-soft); line-height: 1.4; }
+
+        .logout-link {
+            display: block; text-align: center; margin-top: 10px;
+            color: var(--danger); font-size: 14px; font-weight: 600; text-decoration: none; 
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .logout-link:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <header class="header-section">
+            <div class="avatar-placeholder">💻</div>
+            <h1 class="title">Admin Dashboard</h1>
+            <p class="subtitle">Manage content and configurations</p>
+            <div id="activeUserBadge" class="user-greeting"></div>
+        </header>
+
+        <div id="dashboardView">
+            <div class="module-grid">
+                <a href="adminnews.html?app=app10#post" class="action-card">
+                    <div class="card-icon">📝</div>
+                    <div class="card-text">
+                        <h3>Publish Content</h3>
+                        <p>Write new tips, updates, and articles.</p>
+                    </div>
+                </a>
+                <a href="contacts.html?app=app10#contacts" class="action-card">
+                    <div class="card-icon">💬</div>
+                    <div class="card-text">
+                        <h3>User Messages</h3>
+                        <p>Read feedback and manage connections.</p>
+                    </div>
+                </a>
+                <a href="adman.html" class="action-card">
+                    <div class="card-icon">📢</div>
+                    <div class="card-text">
+                        <h3>Manage Ads</h3>
+                        <p>Configure and monitor your advertisements.</p>
+                    </div>
+                </a>
+                
+                <!-- NEW: Notifications Card -->
+                <a href="push.html" class="action-card">
+                    <div class="card-icon">🔔</div>
+                    <div class="card-text">
+                        <h3>Notifications</h3>
+                        <p>Send alerts and push notifications.</p>
+                    </div>
+                </a>
+
+                <!-- NEW: Security Settings Card -->
+                <a href="pin.html" class="action-card">
+                    <div class="card-icon">🔒</div>
+                    <div class="card-text">
+                        <h3>Security Settings</h3>
+                        <p>Update admin PIN and username.</p>
+                    </div>
+                </a>
+            </div>
+            
+            <a class="logout-link" onclick="logout()">Secure Log Out</a>
+        </div>
+    </div>
+
+    <script>
+        if (sessionStorage.getItem('bekaAuth') !== 'true') {
+            window.location.href = 'loginnew.html';
+        }
+
+        const activeUser = sessionStorage.getItem('bekaUser') || 'Admin';
+        document.getElementById('activeUserBadge').innerText = `Logged in as: ${activeUser}`;
+        
+        function logout() {
+            sessionStorage.removeItem('bekaAuth'); 
+            sessionStorage.removeItem('bekaUser');
+            window.location.href = 'loginnew.html';
+        }
+    </script>
+</body>
+</html>

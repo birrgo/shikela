@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Security Settings - Yala Tech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F1F5F9; --surface-color: #FFFFFF; --text-main: #0F172A; --text-soft: #64748B;
+            --primary: #2563EB; --primary-hover: #1D4ED8;
+            --border-color: #E2E8F0; --input-bg: #F8FAFC;
+            --success: #059669; --danger: #DC2626;
+            --radius-lg: 20px; --radius-md: 12px; --radius-sm: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --shadow-blue: 0 4px 14px 0 rgba(37, 99, 235, 0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-color); color: var(--text-main);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 24px 16px;
+        }
+
+        .dashboard-wrapper {
+            width: 100%; max-width: 440px; background: var(--surface-color);
+            border-radius: var(--radius-lg); padding: 36px 32px;
+            box-shadow: var(--shadow-lg); border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .header-section { text-align: center; margin-bottom: 24px; }
+        .avatar-placeholder {
+            width: 64px; height: 64px; background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            color: var(--text-main); border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; font-size: 28px; margin: 0 auto 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .title { font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .subtitle { font-size: 14px; color: var(--text-soft); font-weight: 500; margin-bottom: 20px;}
+        
+        .settings-area {
+            background: var(--surface-color); border-radius: var(--radius-md);
+            padding: 20px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm); margin-bottom: 16px;
+        }
+        
+        .custom-input {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 14px 16px; font-size: 14px;
+            outline: none; margin-bottom: 12px; transition: border-color 0.2s ease;
+            color: var(--text-main);
+        }
+        .custom-input:focus { border-color: var(--primary); background: #FFF; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .pin-input { text-align: center; letter-spacing: 6px; font-weight: 600; font-size: 16px; }
+
+        .primary-btn {
+            width: 100%; background: var(--primary); color: white; border: none;
+            padding: 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; 
+            cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.2s ease;
+        }
+        .primary-btn:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-blue); }
+        .primary-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .secondary-btn {
+            background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-main);
+            width: 100%; padding: 14px; border-radius: var(--radius-sm); font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none;
+            display: inline-block; text-align: center;
+        }
+        .secondary-btn:hover { background: var(--bg-color); border-color: #CBD5E1; }
+
+        /* Modals */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+        
+        .dialog-box {
+            background: var(--surface-color); width: 100%; max-width: 360px;
+            border-radius: var(--radius-lg); padding: 32px 24px; text-align: center;
+            box-shadow: var(--shadow-lg); animation: slideUp 0.3s ease;
+        }
+        
+        .dialog-icon {
+            width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 24px; margin: 0 auto 16px;
+        }
+        .dialog-icon.success { background: #D1FAE5; color: var(--success); }
+        .dialog-icon.error { background: #FEE2E2; color: var(--danger); }
+        .dialog-icon.lock { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); }
+        
+        .dialog-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+        .dialog-desc { font-size: 14px; color: var(--text-soft); margin-bottom: 24px; line-height: 1.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <header class="header-section">
+            <div class="avatar-placeholder">🔒</div>
+            <h1 class="title">Security Settings</h1>
+            <p class="subtitle">Update your admin credentials</p>
+        </header>
+
+        <div class="settings-area">
+            <button class="secondary-btn" id="unlockSettingsBtn" onclick="requestOldPin()">Unlock to Update Login</button>
+
+            <!-- Hidden Form reveals only after old PIN is verified -->
+            <div id="updateSettingsForm" style="display: none; margin-top: 5px;">
+                <div class="form-group">
+                    <input type="text" id="newName" class="custom-input" placeholder="New Display Name">
+                    <input type="password" id="newPin" class="custom-input pin-input" placeholder="New PIN">
+                    <input type="password" id="confirmPin" class="custom-input pin-input" placeholder="Confirm New PIN" style="margin-bottom: 16px;">
+                </div>
+                <button class="primary-btn" id="saveCredsBtn" onclick="updateSecurity()">Save Changes</button>
+            </div>
+        </div>
+
+        <a href="new.html" class="secondary-btn">← Back to Dashboard</a>
+    </div>
+
+    <!-- PIN Prompt Modal -->
+    <div id="pinPromptModal" class="modal-overlay">
+        <div class="dialog-box">
+            <div class="dialog-icon lock">🔒</div>
+            <h3 class="dialog-title">Security Verification</h3>
+            <p class="dialog-desc">Enter your current PIN to access sensitive settings.</p>
+            <input type="password" id="promptOldPin" class="custom-input pin-input" placeholder="••••">
+            <div style="display: flex; gap: 12px; margin-top: 8px;">
+                <button class="secondary-btn" onclick="closePinPrompt()">Cancel</button>
+                <button class="primary-btn" onclick="verifyOldPin()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Friendly Dialog Modal -->
+    <div id="friendlyModal" class="modal-overlay">
+        <div class="dialog-box">
+            <div id="dialogIcon" class="dialog-icon"></div>
+            <h3 id="dialogTitle" class="dialog-title">Title</h3>
+            <p id="dialogDesc" class="dialog-desc">Description goes here.</p>
+            <button class="secondary-btn" onclick="closeDialog()">Got it</button>
+        </div>
+    </div>
+
+    <script>
+        if (sessionStorage.getItem('bekaAuth') !== 'true') {
+            window.location.href = 'loginnew.html';
+        }
+
+        // UPDATED: Now targeting app10
+        const APP_NODE = "app10";
+        const DEFAULT_PIN = "1234";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqwgwiukwKb7o6gwnaLoPQSWc7BfMDuYQ",
+            authDomain: "besuad.firebaseapp.com",
+            databaseURL: "https://besuad-default-rtdb.firebaseio.com",
+            projectId: "besuad",
+            storageBucket: "besuad.firebasestorage.app",
+            messagingSenderId: "641705823615",
+            appId: "1:641705823615:web:6502b2511ff8c0f251de4a",
+            measurementId: "G-2YSX71N08Q"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Pre-fill existing name
+        const activeUser = sessionStorage.getItem('bekaUser') || 'Admin';
+        document.getElementById('newName').value = activeUser;
+
+        function showDialog(type, title, message) {
+            const icon = document.getElementById('dialogIcon');
+            document.getElementById('dialogTitle').innerText = title;
+            document.getElementById('dialogDesc').innerText = message;
+
+            if (type === 'success') {
+                icon.className = 'dialog-icon success';
+                icon.innerText = '✓';
+            } else {
+                icon.className = 'dialog-icon error';
+                icon.innerText = '!';
+            }
+            document.getElementById('friendlyModal').classList.add('show');
+        }
+
+        function closeDialog() { document.getElementById('friendlyModal').classList.remove('show'); }
+
+        function requestOldPin() {
+            document.getElementById('promptOldPin').value = '';
+            document.getElementById('pinPromptModal').classList.add('show');
+        }
+
+        function closePinPrompt() {
+            document.getElementById('pinPromptModal').classList.remove('show');
+        }
+
+        async function verifyOldPin() {
+            const enteredPin = document.getElementById('promptOldPin').value.trim();
+            if (!enteredPin) return;
+
+            const btn = document.querySelector('#pinPromptModal .primary-btn');
+            btn.innerText = "Checking...";
+
+            try {
+                // This naturally reads from app10/adminPin based on the APP_NODE change above
+                const pinSnap = await db.ref(`${APP_NODE}/adminPin`).once('value');
+                const validPin = pinSnap.val() || DEFAULT_PIN;
+
+                if (enteredPin === validPin.toString()) {
+                    closePinPrompt();
+                    document.getElementById('unlockSettingsBtn').style.display = 'none';
+                    document.getElementById('updateSettingsForm').style.display = 'block';
+                } else {
+                    showDialog('error', 'Incorrect PIN', 'The PIN you entered is wrong.');
+                }
+            } catch (err) {
+                console.error(err);
+                showDialog('error', 'Error', 'Could not verify PIN.');
+            } finally {
+                btn.innerText = "Verify";
+            }
+        }
+
+        async function updateSecurity() {
+            const newName = document.getElementById('newName').value.trim();
+            const newPin = document.getElementById('newPin').value.trim();
+            const cfmPin = document.getElementById('confirmPin').value.trim();
+            const btn = document.getElementById('saveCredsBtn');
+
+            if (!newName) return showDialog('error', 'Name required', 'Please enter a name.');
+            if (!newPin || !cfmPin) return showDialog('error', 'PINs required', 'Please fill out both PIN fields to update.');
+            if (newPin !== cfmPin) return showDialog('error', 'PINs don\'t match', 'Your new PIN and the confirmation don\'t match.');
+            if (newPin.length < 4) return showDialog('error', 'Too short', 'For security, your new PIN should be at least 4 digits.');
+
+            btn.disabled = true;
+            btn.innerText = "Saving...";
+
+            try {
+                // This writes to app10/adminPin and app10/adminUsername
+                await db.ref(`${APP_NODE}/adminPin`).set(newPin);
+                await db.ref(`${APP_NODE}/adminUsername`).set(newName);
+                
+                sessionStorage.setItem('bekaUser', newName);
+                
+                showDialog('success', 'All set!', 'Your login details have been updated successfully.');
+
+                document.getElementById('newPin').value = "";
+                document.getElementById('confirmPin').value = "";
+                document.getElementById('updateSettingsForm').style.display = 'none';
+                document.getElementById('unlockSettingsBtn').style.display = 'block';
+                
+            } catch (err) {
+                console.error(err);
+                showDialog('error', 'Uh oh!', 'Something went wrong while saving. Try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Save Changes";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,903 @@
+```html
+<!DOCTYPE html>
+<html lang="am" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ሀብታም አባት ድሃ አባት - ሙሉ መጽሐፍ በትርጉም</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@300;400;500;600;700;800&family=Cinzel:wght@600;800&display=swap');
+        
+        body {
+            font-family: 'Noto Sans Ethiopic', sans-serif;
+            background-color: #080c14;
+            color: #e2e8f0;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* 3D Physical Book Styles */
+        .book-container {
+            perspective: 1200px;
+        }
+
+        .physical-book {
+            width: 220px;
+            height: 310px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.7), inset 4px 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .physical-book:hover {
+            transform: rotateY(-20deg) rotateX(8deg) scale(1.02);
+        }
+
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 4px 12px 12px 4px;
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #451a03 100%);
+            border: 2px solid #f59e0b;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.5rem;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        }
+
+        .book-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 100%;
+            background: linear-gradient(90deg, #d97706, #78350f);
+            transform: rotateY(-90deg) translateZ(14px);
+            border-radius: 3px 0 0 3px;
+        }
+
+        .book-pages-side {
+            position: absolute;
+            right: 0;
+            top: 4px;
+            width: 24px;
+            height: calc(100% - 8px);
+            background: repeating-linear-gradient(90deg, #fef3c7, #fef3c7 2px, #d97706 3px, #fef3c7 4px);
+            transform: rotateY(90deg) translateZ(208px);
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        /* Realistic Paper Texture Page */
+        .paper-page {
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#e5e7eb 0.5px, transparent 0.5px);
+            background-size: 16px 16px;
+            color: #1e293b;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 25px 0 30px -15px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        /* Reading Progress Bar */
+        #progress-bar {
+            width: 0%;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Chapter passage typography for physical paper */
+        .book-content p {
+            margin-bottom: 1.35rem;
+            line-height: 1.9;
+            font-size: 1.08rem;
+            color: #1e293b;
+            text-align: justify;
+        }
+
+        .book-content h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #92400e;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .book-content blockquote {
+            border-right: 4px solid #d97706;
+            background: rgba(245, 158, 11, 0.08);
+            padding: 1.1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0.5rem 0 0 0.5rem;
+            font-style: italic;
+            color: #451a03;
+            font-weight: 500;
+        }
+
+        .active-chapter {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #080c14; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- Reading Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-800 z-50">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-red-500"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-1 z-40 glass-panel border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <button id="menu-toggle" class="lg:hidden p-2 text-slate-400 hover:text-white">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <div class="p-2 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-500">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white leading-tight">ሀብታም አባት ድሃ አባት</h1>
+                    <p class="text-xs text-amber-400/80">ሙሉ ድምፅ (Audiobook) እና የመጽሐፍ ገጽ</p>
+                </div>
+            </div>
+
+            <!-- Global Audio Player Header Controller -->
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <button id="global-audio-btn" onclick="toggleAudioSpeech()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 rounded-xl text-xs font-extrabold hover:brightness-110 transition shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                    <i id="audio-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+                    <span id="audio-btn-label">በአማርኛ አዳምጥ (Play Audio)</span>
+                </button>
+                <button onclick="toggleFontSize()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 border border-slate-700">
+                    <i data-lucide="type" class="w-4 h-4"></i> <span id="font-size-label">መደበኛ</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow flex gap-8 w-full relative">
+
+        <!-- Mobile Drawer Backdrop -->
+        <div id="drawer-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleMobileMenu()"></div>
+
+        <!-- Sidebar Navigation (Chapters List) -->
+        <aside id="sidebar" class="fixed lg:sticky top-20 left-0 z-40 w-80 h-[calc(100vh-6rem)] glass-panel rounded-2xl p-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 border border-slate-800">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+                <h2 class="font-bold text-amber-400 flex items-center gap-2">
+                    <i data-lucide="list-tree" class="w-5 h-5"></i> የምዕራፎች ማውጫ
+                </h2>
+                <button onclick="toggleMobileMenu()" class="lg:hidden text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <nav id="chapter-list" class="space-y-1.5 text-sm font-medium">
+                <!-- Dynamically Populated Chapter Links -->
+            </nav>
+        </aside>
+
+        <!-- Main Content Viewer -->
+        <main class="flex-grow max-w-4xl mx-auto w-full">
+
+            <!-- 3D Physical Book Showcase Banner -->
+            <section class="glass-panel p-6 sm:p-8 rounded-2xl mb-8 border border-amber-500/20 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+                <div class="book-container shrink-0">
+                    <div class="physical-book">
+                        <div class="book-spine"></div>
+                        <div class="book-cover">
+                            <div>
+                                <span class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">አለም አቀፍ ምርጥ መጽሐፍ</span>
+                                <h3 class="text-xl font-extrabold text-white mt-1 leading-tight">ሀብታም አባት<br><span class="text-amber-400">ድሃ አባት</span></h3>
+                            </div>
+                            <div class="my-auto text-center">
+                                <div class="w-12 h-12 mx-auto bg-amber-500/20 rounded-full flex items-center justify-center border border-amber-500/40 text-amber-400">
+                                    <i data-lucide="headphones" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-[11px] text-slate-300 font-medium">በ ሮበርት ኪዮሳኪ</p>
+                                <p class="text-[9px] text-amber-400/80">ተግባራዊ የአማርኛ ትርጉም እና ኦዲዮ</p>
+                            </div>
+                        </div>
+                        <div class="book-pages-side"></div>
+                    </div>
+                </div>
+
+                <div class="flex-grow text-center md:text-left">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-3">
+                        <i data-lucide="disc" class="w-3.5 h-3.5 animate-spin"></i> ሙሉ የአማርኛ ኦዲዮ ተካቷል (Full Audio)
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">
+                        የእውነተኛ መጽሐፍ የንባብና የድምፅ ልምድ
+                    </h2>
+                    <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
+                        ይህ ድህረ ገጽ የመጽሐፉን ገፆች እንደ እውነተኛ መጽሐፍ ወረቀት ገጽ (Physical Book Page) አድርጎ የሚያቀርብ ሲሆን፣ ሙሉውን መጽሐፍ በምዕራፍ ተከፋፍሎ በድምፅ (Audiobook Speech) ማዳመጥ ያስችሎታል።
+                    </p>
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                        <button onclick="toggleAudioSpeech()" class="px-4 py-2 bg-amber-500 text-slate-950 rounded-xl text-xs font-extrabold hover:bg-amber-400 transition flex items-center gap-2 shadow-lg shadow-amber-500/20">
+                            <i data-lucide="play" class="w-4 h-4"></i> ምዕራፉን በድምፅ ጀምር
+                        </button>
+                        <a href="#simulator" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition border border-slate-700 flex items-center gap-2">
+                            <i data-lucide="calculator" class="w-4 h-4"></i> የገንዘብ ሲሙሌተር
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Physical Book Page Container -->
+            <article id="chapter-container" class="paper-page p-6 sm:p-12 rounded-2xl mb-8 border border-amber-900/10 min-h-[600px] transition-all">
+                
+                <!-- Audio Player Toolbar Header -->
+                <div class="bg-amber-900/10 p-4 rounded-xl border border-amber-900/20 mb-8 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <button id="page-audio-play-btn" onclick="toggleAudioSpeech()" class="w-10 h-10 bg-amber-600 hover:bg-amber-700 text-white rounded-full flex items-center justify-center shadow-md transition">
+                            <i id="page-audio-icon" data-lucide="play" class="w-5 h-5 ml-0.5"></i>
+                        </button>
+                        <div>
+                            <span id="audio-status-label" class="text-xs font-bold text-amber-900 block">ድምፅ፡ አልተጀመረም</span>
+                            <span class="text-[11px] text-amber-800/80">በአማርኛ ቋንቋ ንባብ (Amharic Speech Synthesis)</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-semibold text-amber-900">ፍጥነት፡</label>
+                        <select id="audio-rate" onchange="changeAudioRate(this.value)" class="bg-white/80 border border-amber-900/30 rounded-lg text-xs font-bold text-amber-900 p-1.5 focus:outline-none">
+                            <option value="0.8">0.8x</option>
+                            <option value="1" selected>1.0x (መደበኛ)</option>
+                            <option value="1.2">1.2x</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Physical Page Book Header -->
+                <div class="border-b-2 border-amber-900/20 pb-6 mb-8">
+                    <div class="flex items-center justify-between text-xs font-bold text-amber-800 mb-2">
+                        <span id="chapter-number-tag">ምዕራፍ 1</span>
+                        <span id="chapter-read-time" class="text-amber-800/80 flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 15 ደቂቃ ንባብ</span>
+                    </div>
+                    <h2 id="chapter-title" class="text-2xl sm:text-3xl font-extrabold text-amber-950 leading-tight">...</h2>
+                    <p id="chapter-subtitle" class="text-sm text-amber-800 mt-2 italic font-medium"></p>
+                </div>
+
+                <!-- Book Body Paper Page Text Content -->
+                <div id="chapter-body" class="book-content transition-all duration-300">
+                    <!-- Text content loaded via JS -->
+                </div>
+
+                <!-- Chapter Physical Page Navigation -->
+                <div class="flex items-center justify-between pt-8 border-t-2 border-amber-900/20 mt-12">
+                    <button id="prev-chapter-btn" onclick="navigateChapter(-1)" class="px-4 py-2.5 bg-amber-900/10 hover:bg-amber-900/20 text-amber-950 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 border border-amber-900/30 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> ያለፈው ገጽ / ምዕራፍ
+                    </button>
+                    <span id="chapter-pagination-indicator" class="text-xs text-amber-900 font-extrabold bg-amber-900/10 px-3 py-1 rounded-full">1 / 10</span>
+                    <button id="next-chapter-btn" onclick="navigateChapter(1)" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2 shadow-lg shadow-amber-600/30 disabled:opacity-40 disabled:cursor-not-allowed">
+                        ቀጣይ ገጽ / ምዕራፍ <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </article>
+
+            <!-- Interactive Cashflow Simulator -->
+            <section id="simulator" class="glass-panel p-6 sm:p-8 rounded-2xl border border-amber-500/30 mb-12 relative">
+                <div class="text-center max-w-xl mx-auto mb-8">
+                    <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold rounded-full uppercase tracking-wider">የመጽሐፉ ዋና ተግባራዊ ልምምድ</span>
+                    <h3 class="text-2xl font-bold text-white mt-2">የገንዘብ ፍሰት (Cash Flow) ሲሙሌተር</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">ሀብታሙ አባት ባስተማሩት መሠረት ሀብት (Asset) እና ዕዳ (Liability) በሕይወትዎ ውስጥ ገንዘብን እንዴት እንደሚያንቀሳቅሱ በተግባር ይሞክሩ።</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    <!-- Actions -->
+                    <div class="space-y-4">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">ወርሃዊ ደመወዝ / ስራ (ብር)</label>
+                            <input id="sim-salary" type="number" value="12000" oninput="updateSim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-amber-400 font-bold text-sm focus:outline-none focus:border-amber-500">
+                        </div>
+
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> ሀብት መግዛት (ወደ ኪስ ገንዘብ የሚያስገባ)</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="addSimAsset('አክሲዮን / ቦንድ', 2000)" class="p-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-medium text-left flex justify-between items-center transition">
+                                    <span>+ አክሲዮን</span>
+                                    <span class="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded text-emerald-400">+2,000</span>
+                                </button>
+                                <button onclick="addSimAsset('የኪራይ ቤት', 4500)" class="p-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-medium text-left flex justify-between items-center transition">
+                                    <span>+ የኪራይ ቤት</span>
+                                    <span class="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded text-emerald-400">+4,500</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-1"><i data-lucide="minus-circle" class="w-3.5 h-3.5"></i> ዕዳ መውሰድ (ከኪስ ገንዘብ የሚያወጣ)</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="addSimLiability('የቅንጦት መኪና ብድር', 3000)" class="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 rounded-lg text-xs font-medium text-left flex justify-between items-center transition">
+                                    <span>+ መኪና ብድር</span>
+                                    <span class="text-[10px] bg-red-500/20 px-1.5 py-0.5 rounded text-red-400">-3,000</span>
+                                </button>
+                                <button onclick="addSimLiability('ትልቅ የቤት ብድር', 5500)" class="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 rounded-lg text-xs font-medium text-left flex justify-between items-center transition">
+                                    <span>+ የቤት ብድር</span>
+                                    <span class="text-[10px] bg-red-500/20 px-1.5 py-0.5 rounded text-red-400">-5,500</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button onclick="resetSim()" class="w-full py-2 text-xs text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> ሁሉንም እንደነበረ መልስ
+                        </button>
+                    </div>
+
+                    <!-- Output Stats -->
+                    <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div>
+                                <span class="text-xs text-slate-400 font-medium">የተጣራ ወርሃዊ ገቢ</span>
+                                <div id="sim-net-cashflow" class="text-2xl font-extrabold text-amber-400 mt-0.5">12,000 ብር</div>
+                            </div>
+                            <span id="sim-badge" class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-[11px] font-semibold">
+                                የሰራተኛ ገቢ
+                            </span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-emerald-400 mb-1">
+                                    <span>ሀብቶች (Assets)</span>
+                                    <span id="sim-asset-total">+0 ብር</span>
+                                </div>
+                                <div id="sim-assets-list" class="space-y-1 text-xs text-slate-300 max-h-28 overflow-y-auto pr-1">
+                                    <div class="text-slate-500 italic text-center py-2">ምንም ሀብት አልተገዛም</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-red-400 mb-1">
+                                    <span>ዕዳዎች (Liabilities)</span>
+                                    <span id="sim-liability-total">-0 ብር</span>
+                                </div>
+                                <div id="sim-liabilities-list" class="space-y-1 text-xs text-slate-300 max-h-28 overflow-y-auto pr-1">
+                                    <div class="text-slate-500 italic text-center py-2">ምንም ዕዳ አልተወሰደም</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="sim-message" class="p-3 bg-slate-800/80 rounded-lg border border-slate-700 text-xs text-slate-300 flex items-start gap-2">
+                            <i data-lucide="info" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+                            <span>ሀብቶች ገቢዎን ይጨምራሉ። ዕዳዎች ደግሞ ወጪዎን ይጨምራሉ። ዓላማዎ ከRat Race ለመውጣት የሀብት ገቢዎን ማሳደግ ነው።</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Full Translated Book Content Data Structure
+        const bookData = [
+            {
+                id: 1,
+                title: "መግቢያ፡ ሀብታም አባት ድሃ አባት",
+                subtitle: "የሁለት አባቶች ታሪክ እና የሁለት አመለካከቶች ውድድር",
+                readTime: "12 ደቂቃ",
+                content: `
+                    <p>ሁለት አባቶች ነበሩኝ፤ አንደኛው ሀብታም ሌላኛው ድሃ። አንደኛው ከፍተኛ ትምህርት የተማረና ዶክተሬት ዲግሪ ያለው ሲሆን፣ ሁለተኛው ደግሞ ስምንተኛ ክፍል እንኳ ያላጠናቀቀ ነበር። ሁለቱም በየስራ መስካቸው ስኬታማና ጠንካራ ሰራተኞች ነበሩ። ነገር ግን ለገንዘብ የነበራቸው አመለካከትና አስተሳሰብ ሙሉ በሙሉ የተቀራረነ ነበር።</p>
+
+                    <p>የተማረው አባቴ (ድሃው አባቴ)፡ "የገንዘብ ፍቅር የክፋት ሁሉ ስር ነው" ይል ነበር። ያልተማረው አባቴ (ሀብታሙ አባቴ) ደግሞ፡ "የገንዘብ እጥረት የክፋት ሁሉ ስር ነው" ይላል። ሁለቱም የተለያየ ምክር ይሰጡኝ ነበር።</p>
+
+                    <h3>የአስተሳሰብ ልዩነቶች</h3>
+                    <p>ድሃው አባቴ፡ "ይህንን ዕቃ መግዛት አልችልም" ማለትን ይወድ ነበር። ሀብታሙ አባቴ ግን "ይህንን ዕቃ ለመግዛት ምን ማድረግ አለብኝ?" ብሎ እንድጠይቅ ያሰለጥነኝ ነበር። የመጀመሪያው አባባል አእምሮን ስራ እንዲያቆም ያደርጋል፤ ሁለተኛው ጥያቄ ግን አእምሮ መልስ እንዲፈልግና እንዲያስብ ያነቃቃዋል።</p>
+
+                    <blockquote>
+                        "አንዱ አባቴ በርታ ተማርና ጥሩ ኩባንያ አግኝተህ ተቀጠር ይለኛል፤ ሌላኛው አባቴ ደግሞ በርታ ተማርና ጥሩ ኩባንያ ገዝተህ በባለቤትነት አስተዳድር ይለኛል።"
+                    </blockquote>
+
+                    <p>እነዚህ ሁለት የተለያዩ አመለካከቶች በህይወቴ ውስጥ ትልቅ ትምህርት ሆኑኝ። በ 9 ዓመቴ የትኛውን አባት ምክር መስማት እንዳለብኝ ለመወሰን ወሰንኩ። በዚህም ምክንያት ያልተማረውን ነገር ግን በገንዘብ አያያዝ ብልህ የሆነውን ሀብታሙን አባቴን ለመስማት ወሰንኩ።</p>
+                `
+            },
+            {
+                id: 2,
+                title: "ምዕራፍ 1፡ ሀብታሞች ለገንዘብ አይሰሩም",
+                subtitle: "ትምህርት 1 - የ Rat Race (የአይጥ አዙሪት) ወጥመድ",
+                readTime: "20 ደቂቃ",
+                content: `
+                    <p>አብዛኞቹ ሰዎች ጠዋት ተነስተው ወደ ስራ ይሄዳሉ፤ ደመወዝ ይቀበላሉ፤ ሂሳቦችን ይከፍላሉ፤ እንደገና ጠዋት ተነስተው ወደ ስራ ይሄዳሉ። ይህ ህይወት "Rat Race" (የአይጥ አዙሪት) ይባላል። ሰዎችን በዚህ አዙሪት ውስጥ የሚያስራቸው ሁለት ዋና ዋና ስሜቶች ናቸው፡ <strong>ፍርሃት</strong> እና <strong>ስግብግብነት (ምኞት)</strong>።</p>
+
+                    <p>ሰዎች ገንዘብ የላቸውም ብለው ይፈራሉ፤ ስለዚህ ጠንክረው ይሰራሉ። ደመወዝ ሲያገኙ ደግሞ በስግብግብነት ወይም በደስታ ስሜት አዳዲስ ዕቃዎችን መግዛት ይፈልጋሉ። ከዚያም ገንዘቡ ያልቃል፤ እንደገና በፍርሃት ተነስተው ወደ ስራ ይሄዳሉ።</p>
+
+                    <h3>ገንዘብ ለእርስዎ እንዲሰራ ማድረግ</h3>
+                    <p>ሀብታሙ አባቴ እንዲህ አለኝ፡ "ሀብታሞች ለገንዘብ አይሰሩም፤ ገንዘብ ለእነሱ እንዲሰራ ያደርጋሉ።" ሰዎች ስለ ገንዘብ ያላቸውን ስሜት መቆጣጠር ሲችሉና በስሜት ምትክ አእምሮአቸውን ሲጠቀሙ፣ የገንዘብ ነፃነት መያዝ ይጀምራሉ።</p>
+
+                    <blockquote>
+                        "ትምህርት ቤት እንዴት ለገንዘብ መስራት እንዳለብን ያስተምረናል፤ ነገር ግን ገንዘብ ለእኛ እንዲሰራ እንዴት እንደምናደርግ አያስተምረንም።"
+                    </blockquote>
+
+                    <p>ከደመወዝ ደመወዝ መኖር ሰዎችን የገንዘብ ባሪያ ያደርጋቸዋል። እውነተኛው ስኬት የሚመጣው አእምሮን በመጠቀም የገንዘብ እድሎችን በመፍጠር ነው።</p>
+                `
+            },
+            {
+                id: 3,
+                title: "ምዕራፍ 2፡ የገንዘብ ትምህርት ለምን ያስፈልጋል?",
+                subtitle: "ትምህርት 2 - በሀብት (Asset) እና በዕዳ (Liability) መካከል ያለው ልዩነት",
+                readTime: "22 ደቂቃ",
+                content: `
+                    <p>ብዙ ገንዘብ ማግኘት ብቻውን ችግርዎን አይፈታውም። ዋናው ቁልፍ ምን ያህል ገንዘብ እንደሚያስቀሩና እንደሚይዙ ማወቅ ነው። ይህ ደግሞ "የገንዘብ እውቀት" (Financial Literacy) ይባላል።</p>
+
+                    <h3>ወርቃማው ህግ</h3>
+                    <p>ሀብታም ለመሆን ከፈለጉ አንድ ወርቃማ ህግ ማወቅ አለብዎት፡ <strong>በሀብት (Asset) እና በዕዳ (Liability) መካከል ያለውን ልዩነት ማወቅ እና ሀብትን መግዛት!</strong></p>
+
+                    <ul>
+                        <li><strong>ሀብት (Asset)፡</strong> ወደ ኪስዎ ገንዘብ የሚያስገባ ነገር ነው። (ምሳሌ፡ የኪራይ ቤቶች፣ አክሲዮኖች፣ ቦንዶች፣ የንግድ ድርጅቶች)</li>
+                        <li><strong>ዕዳ (Liability)፡</strong> ከኪስዎ ገንዘብ የሚያወጣ ነገር ነው። (ምሳሌ፡ በብድር የተገዛ መኪና፣ የክሬዲት ካርድ ዕዳ፣ የቅንጦት ልብሶች)</li>
+                    </ul>
+
+                    <blockquote>
+                        "ድሃው አባቴ 'ቤታችን ትልቁ ሀብታችን ነው' ይላል። ሀብታሙ አባቴ ግን 'ቤትህ ከኪስህ ገንዘብ የሚያወጣ ከሆነ ዕዳ (Liability) ነው' ይላል።"
+                    </blockquote>
+
+                    <p>ሀብታሞች ሀብትን (Assets) ይሰበስባሉ። ድሃና መካከለኛ ክፍል ያላቸው ሰዎች ደግሞ ዕዳዎችን (Liabilities) እየገዙ ሀብት የገዙ ይመስላቸዋል።</p>
+                `
+            },
+            {
+                id: 4,
+                title: "ምዕራፍ 3፡ የራስዎን ንግድ ያሳድጉ",
+                subtitle: "ትምህርት 3 - በሙያ እና በንግድ መካከል ያለው ልዩነት",
+                readTime: "18 ደቂቃ",
+                content: `
+                    <p>ብዙ ሰዎች እድሜያቸውን ሙሉ ለሌላ ሰው ኩባንያ ወይም ለስራ አበሪያቸው ሲሰሩ ይኖራሉ። የራሳቸውን ንግድና ሀብት ግን አይገነቡም።</p>
+
+                    <p>የእርስዎ "ሙያ" (Profession) እና የእርስዎ "ንግድ" (Business) የተለያየ ሊሆን ይችላል። ለምሳሌ፡ ባንክ ውስጥ የሚሰሩ ከሆነ ሙያዎ ባንከርነት ነው። ነገር ግን ንግድዎ ምንድነው? ንግድዎ የሀብት ማከማቻዎ (Asset Column) ነው።</p>
+
+                    <h3>የእውነተኛ ሀብት ምሳሌዎች</h3>
+                    <p>ሀብታሙ አባቴ የሚከተሉትን ነገሮች እውነተኛ ሀብት ብሎ ይፈትሻቸዋል፡</p>
+                    <ol>
+                        <li>የእርስዎን በአካል መገኘት የማይፈልጉ የንግድ ድርጅቶች (ሌሎች ሰዎች የሚያስተዳድሯቸው)</li>
+                        <li>አክሲዮኖች (Stocks)</li>
+                        <li>ቦንዶች (Bonds)</li>
+                        <li>ገቢ የሚያስገቡ የኪራይ ቤቶችና ህንጻዎች</li>
+                        <li>የፈጠራ መብቶች (Royalties)</li>
+                    </ol>
+
+                    <p>የቀን ስራዎን አይተው። ነገር ግን ከደመወዝዎ የተወሰነውን በመቀነስ እውነተኛ ሀብቶችን ለመግዛት ይጠቀሙበት።</p>
+                `
+            },
+            {
+                id: 5,
+                title: "ምዕራፍ 4፡ የታክስ ታሪክ እና የኮርፖሬሽን ኃይል",
+                subtitle: "ትምህርት 4 - ሀብታሞች በህግ የታገዘ የገንዘብ ጥበብን እንዴት ይጠቀማሉ",
+                readTime: "25 ደቂቃ",
+                content: `
+                    <p>ታክስ በመጀመሪያ የተጀመረው ከሀብታሞች ላይ ገንዘብ ወስዶ ለድሆች ለመስጠት ነበር። ነገር ግን ታሪክ እንደሚያሳየው በመጨረሻ ታክስ በብዛት መከፈል የጀመረው በመካከለኛው ክፍልና በድሆች ላይ ሆነ።</p>
+
+                    <h3>ሀብታሞች ታክስን እንዴት ይቀንሳሉ?</h3>
+                    <p>ሀብታሞች ኩባንያዎችን (Corporations) በመጠቀም ህጋዊ በሆነ መንገድ ታክስን ይቀንሳሉ። የተቀጠረ ሰራተኛ እና የኩባንያ ባለቤት የገንዘብ አከፋፈላቸው እንዲህ ይለያያል፡</p>
+
+                    <h4>የተቀጠረ ሰራተኛ፡</h4>
+                    <p>1. ገንዘብ ያገኛል ➔ 2. ታክስ ይከፍላል ➔ 3. የተረፈውን ይጠቀማል።</p>
+
+                    <h4>የኩባንያ (Corporation) ባለቤት፡</h4>
+                    <p>1. ገንዘብ ያገኛል ➔ 2. ወጪዎቹን ያወጣል ➔ 3. በተረፈው ላይ ብቻ ታክስ ይከፍላል።</p>
+
+                    <blockquote>
+                        "የገንዘብ አይኪው (Financial IQ) ማለት አራት ነገሮችን ማወቅ ነው፡ ሂሳብ አያያዝ (Accounting)፣ ኢንቨስትመንት (Investing)፣ ገበያን ማወቅ (Markets) እና ህግን ማወቅ (Law)።"
+                    </blockquote>
+                `
+            },
+            {
+                id: 6,
+                title: "ምዕራፍ 5፡ ሀብታሞች ገንዘብን ይፈጥራሉ",
+                subtitle: "ትምህርት 5 - ድፍረት እና የገንዘብ ብልህነት",
+                readTime: "20 ደቂቃ",
+                content: `
+                    <p>በእውነተኛው አለም ውስጥ ስኬታማ የሚሆኑት ብልሆቹ ብቻ አይደሉም፤ ይልቁንም ደፋሮቹ ናቸው። በፍርሃት ምክንያት ብዙ ብልህ ሰዎች ድሃ ሆነው ይኖራሉ።</p>
+
+                    <p>ገንዘብ እውነተኛ ነገር አይደለም፤ ገንዘብ አእምሮአችን የፈጠረው ሀሳብ ነው። አእምሮዎን በገንዘብ ትምህርት ካሰለጠኑት፣ ከምንም ተነስተው ሀብት መፍጠር ይችላሉ።</p>
+
+                    <h3>ሁለት ዓይነት ኢንቨስተሮች</h3>
+                    <p>1. <strong>ተራ ኢንቨስተሮች፡</strong> የተዘጋጁ የኢንቨስትመንት ፓኬጆችን ከባንክ ወይም ከደላላ የሚገዙ።</p>
+                    <p>2. <strong>ሙያተኞች ኢንቨስተሮች፡</strong> እድሎችን እራሳቸው የሚፈጥሩ፣ ሌሎች ሰዎች ያላዩትን እድል የሚያዩ እና ብልህ ሰዎችን አሰባስበው የሚሰሩ።</p>
+                `
+            },
+            {
+                id: 7,
+                title: "ምዕራፍ 6፡ ለመማር ስሩ፤ ለገንዘብ አትስሩ",
+                subtitle: "ትምህርት 6 - የክህሎት አስፈላጊነት",
+                readTime: "18 ደቂቃ",
+                content: `
+                    <p>ብዙ የተማሩ ሰዎች በገንዘብ ችግር ውስጥ ይወድቃሉ። ምክንያቱም በአንድ መስክ ላይ ብቻ ያተኩራሉ፤ ነገር ግን የንግድና የሽያጭ ክህሎት የላቸውም።</p>
+
+                    <p>በአለም ላይ በጣም አስፈላጊዎቹ ክህሎቶች፡</p>
+                    <ul>
+                        <li>የሽያጭና የገበያ ማስተዋወቅ (Sales and Marketing)</li>
+                        <li>የገንዘብ ፍሰት አስተዳደር (Cash Flow Management)</li>
+                        <li>የሰዎችና የቡድን አስተዳደር (People Management)</li>
+                    </ul>
+
+                    <blockquote>
+                        "የሚሰሩበትን ስራ ሲመርጡ ምን ያህል ደመወዝ እንደሚያገኙ ብቻ አይዩ፤ ይልቁንም ምን ያህል አዲስ ክህሎት እንደሚማሩበት ይመልከቱ።"
+                    </blockquote>
+                `
+            },
+            {
+                id: 8,
+                title: "ምዕራፍ 7፡ እንቅፋቶችን ማሸነፍ",
+                subtitle: "በስኬት መንገድ ላይ የሚመጡ 5 እንቅፋቶች",
+                readTime: "22 ደቂቃ",
+                content: `
+                    <p>ሰዎች የገንዘብ እውቀት እያላቸው እንኳ ሀብታም እንዳይሆኑ የሚያደርጓቸው 5 ምክንያቶች አሉ፡</p>
+
+                    <ol>
+                        <li><strong>ፍርሃት (Fear)፡</strong> ገንዘብ የማጣት ፍርሃት። ሀብታሞች ገንዘብ ማጣትን አይፈሩም፤ ከስህተታቸው ይማራሉ.</li>
+                        <li><strong>ተጠራጣሪነት (Cynicism)፡</strong> የሌሎችን ወይም የራሳችንን አሉታዊ ሀሳቦች መስማት።</li>
+                        <li><strong>ስንፍና (Laziness)፡</strong> በስራ በመጠመድ እውነተኛውን የህይወት ግብ አለማሰብ።</li>
+                        <li><strong>መጥፎ ልምዶች (Bad Habits)፡</strong> መጀመሪያ ለራሳችን ከመክፈል ይልቅ ለሌሎች መክፈል.</li>
+                        <li><strong>ትዕቢት (Arrogance)፡</strong> የማናውቀውን ነገር እንደምናውቅ አድርጎ ማሰብ።</li>
+                    </ol>
+                `
+            },
+            {
+                id: 9,
+                title: "ምዕራፍ 8፡ መጀመር - 10 የእርምጃ ደረጃዎች",
+                subtitle: "የገንዘብ ነፃነትን ለማግኘት የሚረዱ እርምጃዎች",
+                readTime: "25 ደቂቃ",
+                content: `
+                    <p>ሀብታሙ አባት ያስቀመጧቸው 10 ተግባራዊ እርምጃዎች፡</p>
+                    <ol>
+                        <li>ከምንም በላይ የሚበልጥ መንፈሳዊ ወይም የህይወት ምክንያት ይኑርዎት።</li>
+                        <li>በየቀኑ ምርጫዎችን ያድርጉ (አእምሮዎን በማስተማር ላይ ኢንቨስት ያድርጉ)።</li>
+                        <li>ጓደኞችዎን በጥንቃቄ ይምረጡ።</li>
+                        <li>አዳዲስ ቀመሮችንና ትምህርቶችን በፍጥነት ይማሩ።</li>
+                        <li>መጀመሪያ ለራስዎ ይክፈሉ (Pay Yourself First)።</li>
+                        <li>ለባለሙያዎችና ለአማካሪዎች ጥሩ ክፍያ ይክፈሉ።</li>
+                        <li>የኢንቨስትመንትዎን ይመለስ (ROI) በፍጥነት ያሰሉ።</li>
+                        <li>ሀብቶች (Assets) የቅንጦት ዕቃዎችን እንዲገዙልዎ ያድርጉ።</li>
+                        <li>ጀግኖችና አርአያዎች ይኑርዎት።</li>
+                        <li>ስጡ፤ በሚሰጡበት ጊዜ ተመልሶ ይደርስዎታል።</li>
+                    </ol>
+                `
+            },
+            {
+                id: 10,
+                title: "ምዕራፍ 9፡ አሁንም ተጨማሪ ይፈልጋሉ? ማድረግ ያለብዎ ነገሮች",
+                subtitle: "ተግባራዊ የድርጊት መመሪያ",
+                readTime: "15 ደቂቃ",
+                content: `
+                    <p>ማሰብ ማቆም እና እርምጃ መውሰድ ይጀምሩ! የሚከተሉትን ነገሮች ዛሬውኑ ያድርጉ፡</p>
+
+                    <ul>
+                        <li>የሚያደርጉትን ነገር ያቁሙና ምን እየሰራ እንደሆነና ምን እየጎዳዎት እንደሆነ ይገምግሙ።</li>
+                        <li>አዳዲስ ሀሳቦችን ይፈልጉ፤ የፋይናንስ መጻህፍትን ያንብቡ።</li>
+                        <li>ቀደም ሲል ያደረገውን ሰው ያግኙና ምክር ይጠይቁት።</li>
+                        <li>የኢንቨስትመንት ሴሚናሮችንና ትምህርቶችን ይከታተሉ።</li>
+                        <li>ብዙ የቦታና የንብረት አቅርቦቶችን ይቃኙ (Offers)።</li>
+                    </ul>
+
+                    <blockquote>
+                        "ድርጊት ሁልጊዜ ከመጠባበቅ ይበልጣል። ዛሬውኑ እርምጃ ይውሰዱ!"
+                    </blockquote>
+                `
+            }
+        ];
+
+        // Application State Variables
+        let currentChapterIndex = 0;
+        let fontSizeLevel = 1; // 0: small, 1: medium, 2: large
+        let fontClasses = ['text-sm', 'text-base', 'text-lg'];
+
+        // Speech Audio Audiobook State
+        let isSpeaking = false;
+        let speechUtterance = null;
+        let audioRate = 1.0;
+
+        // Simulator State
+        let simSalary = 12000;
+        let simAssets = [];
+        let simLiabilities = [];
+
+        // DOM Elements
+        const chapterTitleEl = document.getElementById('chapter-title');
+        const chapterSubtitleEl = document.getElementById('chapter-subtitle');
+        const chapterNumberTagEl = document.getElementById('chapter-number-tag');
+        const chapterReadTimeEl = document.getElementById('chapter-read-time');
+        const chapterBodyEl = document.getElementById('chapter-body');
+        const chapterListEl = document.getElementById('chapter-list');
+        const prevBtn = document.getElementById('prev-chapter-btn');
+        const nextBtn = document.getElementById('next-chapter-btn');
+        const paginationIndicator = document.getElementById('chapter-pagination-indicator');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderChapterList();
+            loadChapter(0);
+            initProgressBar();
+            lucide.createIcons();
+        });
+
+        // Render Chapter List in Sidebar
+        function renderChapterList() {
+            chapterListEl.innerHTML = bookData.map((chap, idx) => `
+                <button onclick="loadChapter(${idx})" class="w-full text-left p-3 rounded-xl transition flex items-start gap-2.5 ${idx === currentChapterIndex ? 'active-chapter font-bold' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}">
+                    <span class="w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs shrink-0 font-bold text-amber-400">${chap.id}</span>
+                    <div class="truncate">
+                        <div class="truncate font-semibold text-xs leading-snug">${chap.title}</div>
+                        <div class="text-[11px] text-slate-500 font-normal truncate mt-0.5">${chap.readTime}</div>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        // Load Selected Chapter
+        function loadChapter(index) {
+            if (index < 0 || index >= bookData.length) return;
+            
+            stopAudioSpeech();
+
+            currentChapterIndex = index;
+            const chap = bookData[index];
+
+            chapterNumberTagEl.textContent = `ምዕራፍ ${chap.id}`;
+            chapterReadTimeEl.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> ${chap.readTime}`;
+            chapterTitleEl.textContent = chap.title;
+            chapterSubtitleEl.textContent = chap.subtitle;
+            chapterBodyEl.innerHTML = chap.content;
+
+            paginationIndicator.textContent = `${index + 1} / ${bookData.length}`;
+
+            // Update disabled state for prev/next
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === bookData.length - 1;
+
+            renderChapterList();
+            lucide.createIcons();
+
+            // Smooth scroll to top of chapter physical book page
+            document.getElementById('chapter-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Close mobile menu if open
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                toggleMobileMenu();
+            }
+        }
+
+        function navigateChapter(direction) {
+            loadChapter(currentChapterIndex + direction);
+        }
+
+        // --- AMHARIC AUDIOBOOK SPEECH ENGINE ---
+        function toggleAudioSpeech() {
+            if ('speechSynthesis' in window) {
+                if (isSpeaking) {
+                    stopAudioSpeech();
+                } else {
+                    startAudioSpeech();
+                }
+            } else {
+                alert('የእርስዎ ብራውዘር የድምፅ ማጫወቻ (Speech Synthesis) አይደግፍም።');
+            }
+        }
+
+        function startAudioSpeech() {
+            window.speechSynthesis.cancel();
+
+            const chap = bookData[currentChapterIndex];
+            // Clean HTML tags for speech synthesizer
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = chap.content;
+            const rawText = `${chap.title}። ${chap.subtitle}። ${tempDiv.textContent || tempDiv.innerText}`;
+
+            speechUtterance = new SpeechSynthesisUtterance(rawText);
+            speechUtterance.lang = 'am-ET'; // Amharic language tag
+            speechUtterance.rate = audioRate;
+
+            // Voice selection fallback
+            const voices = window.speechSynthesis.getVoices();
+            const amharicVoice = voices.find(v => v.lang.includes('am') || v.lang.includes('am-ET'));
+            if (amharicVoice) {
+                speechUtterance.voice = amharicVoice;
+            }
+
+            speechUtterance.onstart = () => {
+                isSpeaking = true;
+                updateAudioUIState(true);
+            };
+
+            speechUtterance.onend = () => {
+                isSpeaking = false;
+                updateAudioUIState(false);
+            };
+
+            speechUtterance.onerror = () => {
+                isSpeaking = false;
+                updateAudioUIState(false);
+            };
+
+            window.speechSynthesis.speak(speechUtterance);
+        }
+
+        function stopAudioSpeech() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            isSpeaking = false;
+            updateAudioUIState(false);
+        }
+
+        function changeAudioRate(val) {
+            audioRate = parseFloat(val);
+            if (isSpeaking) {
+                startAudioSpeech();
+            }
+        }
+
+        function updateAudioUIState(playing) {
+            const pageIcon = document.getElementById('page-audio-icon');
+            const statusLabel = document.getElementById('audio-status-label');
+            const audioBtnLabel = document.getElementById('audio-btn-label');
+            const audioIcon = document.getElementById('audio-icon');
+
+            if (playing) {
+                pageIcon.setAttribute('data-lucide', 'square');
+                statusLabel.textContent = "ድምፅ፡ እየተጫወተ ነው (Playing)";
+                statusLabel.className = "text-xs font-bold text-amber-700 animate-pulse block";
+                audioBtnLabel.textContent = "አቁም (Stop Audio)";
+                audioIcon.setAttribute('data-lucide', 'square');
+            } else {
+                pageIcon.setAttribute('data-lucide', 'play');
+                statusLabel.textContent = "ድምፅ፡ አልተጀመረም";
+                statusLabel.className = "text-xs font-bold text-amber-900 block";
+                audioBtnLabel.textContent = "በአማርኛ አዳምጥ (Play Audio)";
+                audioIcon.setAttribute('data-lucide', 'volume-2');
+            }
+            lucide.createIcons();
+        }
+
+        // Reader Accessibility Controls
+        function toggleFontSize() {
+            fontSizeLevel = (fontSizeLevel + 1) % 3;
+            const labels = ['ትንሽ', 'መደበኛ', 'ትልቅ'];
+            document.getElementById('font-size-label').textContent = labels[fontSizeLevel];
+            
+            chapterBodyEl.className = `book-content transition-all duration-300 ${fontClasses[fontSizeLevel]}`;
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('drawer-backdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        document.getElementById('menu-toggle').addEventListener('click', toggleMobileMenu);
+
+        // Reading Progress Tracker
+        function initProgressBar() {
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById('progress-bar').style.width = scrolled + '%';
+            });
+        }
+
+        function updateSim() {
+            const salaryInput = document.getElementById('sim-salary');
+            simSalary = parseFloat(salaryInput.value) || 0;
+
+            const totalAssets = simAssets.reduce((sum, a) => sum + a.amount, 0);
+            const totalLiabilities = simLiabilities.reduce((sum, l) => sum + l.amount, 0);
+            const netCashflow = simSalary + totalAssets - totalLiabilities;
+
+            // UI Render
+            document.getElementById('sim-net-cashflow').textContent = netCashflow.toLocaleString() + ' ብር';
+            document.getElementById('sim-asset-total').textContent = '+' + totalAssets.toLocaleString() + ' ብር';
+            document.getElementById('sim-liability-total').textContent = '-' + totalLiabilities.toLocaleString() + ' ብር';
+
+            // Assets List Render
+            const assetsListEl = document.getElementById('sim-assets-list');
+            if (simAssets.length === 0) {
+                assetsListEl.innerHTML = '<div class="text-slate-500 italic text-center py-2">ምንም ሀብት አልተገዛም</div>';
+            } else {
+                assetsListEl.innerHTML = simAssets.map(a => `
+                    <div class="flex items-center justify-between p-1.5 bg-slate-950 rounded border border-emerald-500/20">
+                        <span>${a.name}</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-emerald-400 font-semibold">+${a.amount}</span>
+                            <button onclick="removeSimAsset(${a.id})" class="text-slate-500 hover:text-red-400 text-xs">✕</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Liabilities List Render
+            const liabListEl = document.getElementById('sim-liabilities-list');
+            if (simLiabilities.length === 0) {
+                liabListEl.innerHTML = '<div class="text-slate-500 italic text-center py-2">ምንም ዕዳ አልተወሰደም</div>';
+            } else {
+                liabListEl.innerHTML = simLiabilities.map(l => `
+                    <div class="flex items-center justify-between p-1.5 bg-slate-950 rounded border border-red-500/20">
+                        <span>${l.name}</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-red-400 font-semibold">-${l.amount}</span>
+                            <button onclick="removeSimLiability(${l.id})" class="text-slate-500 hover:text-red-400 text-xs">✕</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Status message and badge update
+            const badge = document.getElementById('sim-badge');
+            const message = document.getElementById('sim-message');
+
+            if (totalAssets > totalLiabilities && totalAssets >= simSalary) {
+                badge.className = "px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-full text-[11px] font-bold";
+                badge.textContent = "የገንዘብ ነፃነት (Financial Freedom)";
+                message.innerHTML = `<i data-lucide="party-popper" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i> <span>እንኳን ደስ አለዎት! የሀብት ገቢዎ ከደመወዝዎና ከወጪዎ ስለበለጠ ከ Rat Race ወጥተዋል!</span>`;
+                confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 } });
+            } else if (totalLiabilities > (simSalary + totalAssets)) {
+                badge.className = "px-2.5 py-1 bg-red-500/20 border border-red-500/40 text-red-300 rounded-full text-[11px] font-bold";
+                badge.textContent = "የገንዘብ እጥረት / ዕዳ";
+                message.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <span>ማስጠንቀቂያ! ወጪዎ ከገቢዎ በላይ በመሆኑ ወደ ዕዳ እየገቡ ነው። ዕዳዎችን ይቀንሱ!</span>`;
+            } else {
+                badge.className = "px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-[11px] font-semibold";
+                badge.textContent = "የሰራተኛ ገቢ";
+                message.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i> <span>ሀብቶች ገቢዎን ይጨምራሉ። ዕዳዎች ደግሞ ወጪዎን ይጨምራሉ። ዓላማዎ ከRat Race ለመውጣት የሀብት ገቢዎን ማሳደግ ነው።</span>`;
+            }
+            lucide.createIcons();
+        }
+
+        function addSimAsset(name, amount) {
+            simAssets.push({ id: Date.now(), name, amount });
+            updateSim();
+        }
+
+        function addSimLiability(name, amount) {
+            simLiabilities.push({ id: Date.now(), name, amount });
+            updateSim();
+        }
+
+        function removeSimAsset(id) {
+            simAssets = simAssets.filter(a => a.id !== id);
+            updateSim();
+        }
+
+        function removeSimLiability(id) {
+            simLiabilities = simLiabilities.filter(l => l.id !== id);
+            updateSim();
+        }
+
+        function resetSim() {
+            simSalary = 12000;
+            document.getElementById('sim-salary').value = 12000;
+            simAssets = [];
+            simLiabilities = [];
+            updateSim();
+        }
+    </script>
+</body>
+</html>
+```

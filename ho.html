@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#FAF7F7]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to News</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#FF2D55',
+                            redHover: '#E02448',
+                            bg: '#FAF7F7',
+                            textDark: '#000000',
+                            textMuted: '#8E8E93',
+                            linkRed: '#FA2D55',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth micro-interactions */
+        .btn-bounce {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.97);
+        }
+        
+        /* Custom scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-brand-textDark bg-[#FAF7F7] min-h-full flex flex-col justify-between items-center selection:bg-brand-red selection:text-white relative overflow-x-hidden">
+
+    <!-- Container wrapper -->
+    <div class="w-full max-w-md min-h-screen flex flex-col justify-between px-8 pt-12 pb-8 mx-auto relative z-10 no-scrollbar">
+        
+        <!-- Top Section: Centered Logo, Heading & Subtitle -->
+        <div class="flex flex-col items-center text-center pt-6 sm:pt-10">
+            
+            <!-- Generic Geometric News Icon (No Letters / No Brand) -->
+            <div class="mb-8 w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 transition-transform hover:scale-105 duration-300">
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="100" height="100" rx="22" fill="#FF2D55"/>
+                    <rect x="25" y="25" width="50" height="10" rx="5" fill="white"/>
+                    <rect x="25" y="42" width="50" height="10" rx="5" fill="white" opacity="0.8"/>
+                    <rect x="25" y="59" width="32" height="10" rx="5" fill="white" opacity="0.6"/>
+                </svg>
+            </div>
+
+            <!-- Main Heading (Centered & Bold) -->
+            <h1 class="text-4xl sm:text-[44px] font-extrabold tracking-tight leading-[1.08] mb-4 text-black text-center">
+                Gold Detector<br>
+                <span class="text-brand-red tracking-tight font-black">Find gold, discover treasures.</span>
+            </h1>
+
+            <!-- Subtitle Description (Centered) -->
+            <p class="text-lg sm:text-[19px] text-gray-700 font-normal leading-snug max-w-xs text-center">
+                Welcome 
+            </p>
+        </div>
+
+        <!-- Middle & Bottom Section: Privacy Notice + Primary Action -->
+        <div class="w-full flex flex-col items-center mt-12 mb-2">
+            
+            <!-- Privacy Feature Note -->
+            <div class="flex flex-col items-center text-center max-w-[310px] mb-8">
+                <!-- Generic Shield Icon -->
+                <div class="w-8 h-8 mb-3 text-brand-red flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" class="w-7 h-7 fill-current" opacity="0.85">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8s0 0 0 0z"/>
+                    </svg>
+                </div>
+                
+                <!-- Disclaimer Text -->
+                <p class="text-[11.5px] leading-relaxed text-gray-400 font-medium">
+                    Your preferences are stored locally to personalize your feed. We respect your privacy and data security. 
+                    <button onclick="openModal('privacy')" class="text-brand-linkRed hover:underline font-semibold focus:outline-none inline">
+                        Learn about data privacy...
+                    </button>
+                </p>
+            </div>
+
+            <!-- Primary Action Button (Redirects to https://www.hulum.online) -->
+            <a href="https://uplcm.com/4/10851265" class="btn-bounce w-full py-4 bg-brand-red hover:bg-brand-redHover active:bg-brand-redHover text-white font-semibold text-[17px] rounded-2xl shadow-sm tracking-wide text-center block focus:outline-none">
+                Get Started
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="modal-content" class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 text-left shadow-2xl transform translate-y-8 sm:translate-y-0 sm:scale-95 transition-all duration-300">
+            
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 bg-red-50 text-brand-red rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-500 transition-colors">
+                    &#x2715;
+                </button>
+            </div>
+
+            <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-2">Data & Privacy</h3>
+            <p id="modal-desc" class="text-sm text-gray-600 leading-relaxed mb-6">
+                This app is designed with privacy in mind. Your reading habits and preferences stay on your device.
+            </p>
+
+            <button onclick="closeModal()" class="w-full py-3.5 bg-brand-red text-white font-semibold rounded-xl hover:bg-brand-redHover transition-colors text-[15px]">
+                Done
+            </button>
+        </div>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDesc = document.getElementById('modal-desc');
+
+            if (type === 'privacy') {
+                modalTitle.textContent = 'Data & Privacy';
+                modalDesc.textContent = 'Your reading activity, preferences, and personal topics are kept private and secure.';
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('translate-y-8', 'sm:scale-95');
+            modalContent.classList.add('translate-y-0', 'sm:scale-100');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+
+            modalContent.classList.remove('translate-y-0', 'sm:scale-100');
+            modalContent.classList.add('translate-y-8', 'sm:scale-95');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+    </script>
+</body>
+</html>

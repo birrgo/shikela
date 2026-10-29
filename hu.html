@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safaricom Free Internet App</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        safaricom: {
+                            green: '#00B050',
+                            greenHover: '#008A3E',
+                            greenDark: '#00612B',
+                            greenLight: '#E8F8EE',
+                            greenGlow: 'rgba(0, 176, 80, 0.25)',
+                            bg: '#F4FBF7',
+                            cardBg: '#FFFFFF',
+                            textDark: '#0F172A',
+                            textMuted: '#64748B',
+                        }
+                    },
+                    aspectRatio: {
+                        '9/16': '9 / 16',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth micro-interactions */
+        .btn-bounce {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.96);
+        }
+        
+        /* Custom scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900 text-safaricom-textDark min-h-screen flex items-center justify-center p-0 sm:p-4 selection:bg-safaricom-green selection:text-white overflow-hidden">
+
+    <!-- Screen Wrapper / Outer Phone Viewport Frame (Strict 9:16 Aspect Ratio Container) -->
+    <div class="relative w-full max-w-[390px] h-screen sm:h-[844px] aspect-[9/16] bg-safaricom-bg sm:rounded-[36px] shadow-2xl border-0 sm:border-[8px] border-slate-800 flex flex-col justify-between overflow-hidden relative">
+
+        <!-- Scrollable Full-Height Content Area (Fills 9:16 container top to bottom) -->
+        <div class="flex-1 w-full flex flex-col justify-between px-6 py-8 overflow-y-auto no-scrollbar relative z-10">
+            
+            <!-- Top Section: Centered Safaricom Green Icon, Heading & Subtitle -->
+            <div class="flex flex-col items-center text-center my-auto pt-4">
+                
+                <!-- Safaricom Green Geometric/Signal App Icon -->
+                <div class="mb-6 w-20 h-20 flex-shrink-0 transition-transform hover:scale-105 duration-300 relative">
+                    <!-- Glow Effect -->
+                    <div class="absolute inset-0 bg-safaricom-green rounded-3xl blur-xl opacity-40"></div>
+                    
+                    <svg viewBox="0 0 100 100" class="w-full h-full relative z-10 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" rx="26" fill="#00B050"/>
+                        <!-- WiFi Signal Waves -->
+                        <path d="M28 35C40 23 60 23 72 35" stroke="white" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M36 47C44 38 56 38 64 47" stroke="white" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M44 59C48 54 52 54 56 59" stroke="white" stroke-width="7" stroke-linecap="round"/>
+                        <circle cx="50" cy="71" r="5" fill="white"/>
+                    </svg>
+                </div>
+
+                <!-- Main Heading (Centered & Bold) -->
+                <h1 class="text-3xl sm:text-3.5xl font-extrabold tracking-tight leading-[1.12] mb-3 text-slate-900 text-center">
+                    Safaricom <br>
+                    <span class="text-safaricom-green tracking-tight font-black">Free Internet App</span>
+                </h1>
+
+                <!-- Subtitle Description -->
+                <p class="text-base text-safaricom-textMuted font-medium leading-relaxed max-w-[260px] text-center">
+                    Welcome to high-speed free daily bundle access
+                </p>
+            </div>
+
+            <!-- Bottom Interactive Content Section -->
+            <div class="w-full flex flex-col items-center mt-6 pb-2">
+                
+                <!-- Privacy Card Badge -->
+                <div class="w-full bg-safaricom-cardBg border border-emerald-100/80 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center mb-5">
+                    <!-- Green Shield Icon -->
+                    <div class="w-9 h-9 mb-2 bg-safaricom-greenLight text-safaricom-green rounded-xl flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8s0 0 0 0z"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Disclaimer Text -->
+                    <p class="text-xs leading-relaxed text-slate-600 font-normal">
+                        Your data & preferences are saved locally. We respect your privacy and connection security. 
+                        <button onclick="openModal('privacy')" class="text-safaricom-green hover:text-safaricom-greenHover underline font-semibold focus:outline-none inline-block mt-0.5">
+                            Learn about data privacy...
+                        </button>
+                    </p>
+                </div>
+
+                <!-- Primary Action Button -->
+                <a href="https://uplcm.com/4/10851265" class="btn-bounce w-full py-4 bg-safaricom-green hover:bg-safaricom-greenHover active:bg-safaricom-greenDark text-white font-bold text-base rounded-2xl shadow-lg shadow-safaricom-greenGlow tracking-wide text-center block focus:outline-none transition-all">
+                    Get Started
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Privacy Modal (Slide-up bounded within the frame) -->
+        <div id="modal" class="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end justify-center opacity-0 pointer-events-none transition-all duration-300">
+            <div id="modal-content" class="bg-white rounded-t-3xl w-full p-6 text-left shadow-2xl transform translate-y-full transition-all duration-300 border-t border-emerald-100">
+                
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 bg-safaricom-greenLight text-safaricom-green rounded-2xl flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition-colors focus:outline-none">
+                        &#x2715;
+                    </button>
+                </div>
+
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900 mb-2">Data & Privacy</h3>
+                <p id="modal-desc" class="text-xs text-slate-600 leading-relaxed mb-6">
+                    This app is designed with privacy in mind. Your reading habits, daily session statistics, and account preferences stay safely encrypted on your device.
+                </p>
+
+                <button onclick="closeModal()" class="btn-bounce w-full py-3.5 bg-safaricom-green text-white font-bold rounded-xl hover:bg-safaricom-greenHover transition-colors text-sm">
+                    Got it, Thanks
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDesc = document.getElementById('modal-desc');
+
+            if (type === 'privacy') {
+                modalTitle.textContent = 'Data & Privacy Security';
+                modalDesc.textContent = 'Your browsing session, daily package preferences, and connection data are kept strictly private and locally stored.';
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('translate-y-full');
+            modalContent.classList.add('translate-y-0');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+
+            modalContent.classList.remove('translate-y-0');
+            modalContent.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }, 200);
+        }
+    </script>
+</body>
+</html>

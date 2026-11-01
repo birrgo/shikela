@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikToker of the Year Ethiopia - Voting Page</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        awardGold: '#D4AF37',
+                        awardLightGold: '#F3E5AB',
+                        awardDark: '#0E0C0A',
+                        awardCard: '#181512',
+                        awardBorder: '#332B22'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0E0C0A;
+            color: #F3E5AB;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF5CC 0%, #D4AF37 50%, #AA771C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-btn {
+            background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #AA771C 100%);
+            color: #0E0C0A;
+            transition: all 0.2s ease;
+        }
+        .gold-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+        .row-hover {
+            transition: all 0.2s ease;
+        }
+        .row-hover:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col justify-between items-center p-2 sm:p-4 select-none">
+
+    <!-- Header Section with 16:3 Banner Ad -->
+    <header class="w-full max-w-2xl text-center flex-shrink-0 pt-1">
+        <!-- 16:3 Banner Ad -->
+        <div class="w-full mb-2 overflow-hidden rounded-xl border border-[#332B22] shadow-md bg-[#181512]">
+            <img src="tik.jpg" 
+                 alt="Advertisement" 
+                 onerror="this.src='https://placehold.co/800x150/181512/D4AF37?text=16:3+Banner+Ad+(tik.jpg)'" 
+                 class="w-full h-auto object-cover aspect-[16/3] max-h-[75px]">
+        </div>
+
+        <!-- Increased Title Size & Bolder Weight -->
+        <h1 class="text-2xl sm:text-4xl font-black tracking-tight mb-2.5 text-white">
+            TikToker of the <span class="gold-gradient-text">Year</span>
+        </h1>
+
+        <!-- Podium Rank View (Pushed down from title) -->
+        <div class="grid grid-cols-3 gap-1.5 w-full max-w-md mx-auto my-2 items-end">
+            <!-- 3rd Place (Left) -->
+            <div id="podium-rank-3" class="bg-[#181512] border border-[#332B22] rounded-xl p-1.5 text-center shadow-md flex flex-col items-center">
+                <span class="text-[9px] font-bold text-amber-600 mb-0.5">3ኛ ደረጃ</span>
+                <img id="podium-img-3" src="" class="w-8 h-8 rounded-full object-cover ring-1 ring-amber-600/50 mb-0.5">
+                <span id="podium-name-3" class="text-[11px] font-bold text-white truncate w-full">...</span>
+                <span id="podium-votes-3" class="text-[9px] text-[#D4AF37] font-mono">0</span>
+            </div>
+
+            <!-- 1st Place (Center - Elevated) -->
+            <div id="podium-rank-1" class="bg-[#181512] border-2 border-[#D4AF37] rounded-xl p-2 text-center shadow-xl flex flex-col items-center -translate-y-1.5">
+                <span class="text-[10px] font-extrabold text-[#D4AF37] mb-0.5"><i class="fa-solid fa-crown text-amber-400"></i> 1ኛ ደረጃ</span>
+                <img id="podium-img-1" src="" class="w-10 h-10 rounded-full object-cover ring-2 ring-[#D4AF37] mb-0.5 shadow">
+                <span id="podium-name-1" class="text-xs font-extrabold text-white truncate w-full">...</span>
+                <span id="podium-votes-1" class="text-[11px] text-[#F3E5AB] font-bold font-mono">0</span>
+            </div>
+
+            <!-- 2nd Place (Right) -->
+            <div id="podium-rank-2" class="bg-[#181512] border border-[#332B22] rounded-xl p-1.5 text-center shadow-md flex flex-col items-center">
+                <span class="text-[9px] font-bold text-slate-400 mb-0.5">2ኛ ደረጃ</span>
+                <img id="podium-img-2" src="" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-400/50 mb-0.5">
+                <span id="podium-name-2" class="text-[11px] font-bold text-white truncate w-full">...</span>
+                <span id="podium-votes-2" class="text-[9px] text-[#D4AF37] font-mono">0</span>
+            </div>
+        </div>
+
+        <!-- Amharic Rule Text -->
+        <div class="my-1.5 bg-[#181512] border border-[#332B22] rounded-lg py-1 px-3 max-w-md mx-auto shadow-sm">
+            <span class="text-xs sm:text-sm font-extrabold text-white tracking-wide">
+                ⚠️NOTICE ፡ ለአንድ ሰው ብቻ ድምፅ መስጠት የሚፈቀደው
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content List -->
+    <main class="w-full max-w-2xl flex-1 flex flex-col justify-start pt-1 overflow-hidden">
+        <div class="flex flex-col gap-2.5 w-full" id="candidatesListContainer">
+            <!-- Items will be dynamically sorted and rendered here -->
+        </div>
+    </main>
+
+    <!-- Overlay Loading & Redirect Modal -->
+    <div id="redirectModal" class="fixed inset-0 bg-[#0E0C0A]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-[#181512] border border-[#332B22] rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
+            <!-- Dynamic Icon -->
+            <div id="modalIconContainer" class="w-16 h-16 rounded-full border-4 border-[#332B22] border-t-[#D4AF37] animate-spin mx-auto mb-4 flex items-center justify-center">
+                <i id="modalIcon" class="fa-solid fa-trophy text-lg text-[#D4AF37]"></i>
+            </div>
+            
+            <h3 id="modalTitle" class="text-xl font-extrabold text-white mb-1">Vote Counted!</h3>
+            <p id="modalSubtext" class="text-[#A39E93] text-xs mb-4">You voted for <span id="selectedCandidateName" class="font-bold text-[#D4AF37]"></span></p>
+            
+            <div id="redirectInfo" class="flex items-center justify-center gap-2 text-xs text-[#A39E93]">
+                <i class="fa-solid fa-arrows-rotate animate-spin text-[#D4AF37]"></i>
+                <span>Redirecting to <strong>shiqela.online</strong>...</span>
+            </div>
+            
+            <!-- Progress bar container -->
+            <div id="progressBarContainer" class="w-full bg-[#0E0C0A] h-1.5 rounded-full mt-4 overflow-hidden border border-[#332B22]">
+                <div id="modalProgressBar" class="gold-btn h-full w-0 transition-all duration-[1500ms] ease-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="w-full max-w-2xl text-center flex-shrink-0 pb-1 text-[#A39E93] text-[10px]">
+        <p>© 2026 TikToker of the Year Ethiopia. Powered by Shiqela Online.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const DATA_VERSION = 'v14_fixed_counts_40763';
+        if (localStorage.getItem('ethio_data_version') !== DATA_VERSION) {
+            localStorage.removeItem('ethio_tiktoker_votes');
+            localStorage.removeItem('ethio_has_voted');
+            localStorage.removeItem('ethio_voted_candidate');
+            localStorage.setItem('ethio_data_version', DATA_VERSION);
+        }
+
+        let candidates = [
+            { id: 'yasino', name: 'Yasino', handle: '@comedianyasino', img: 'tik3.jpg', fallbackImg: 'https://placehold.co/300x300/181512/D4AF37?text=Yasino', votes: 40763 },
+            { id: 'adonay', name: 'Adonay', handle: '@adonaymada', img: 'tik1.jpg', fallbackImg: 'https://placehold.co/300x300/181512/D4AF37?text=Adonay', votes: 32567 },
+            { id: 'lij_dawud', name: 'Lij Dawud', handle: '@lij.dawud', img: 'tik2.jpg', fallbackImg: 'https://placehold.co/300x300/181512/D4AF37?text=Lij+Dawud', votes: 29549 }
+        ];
+
+        function hasVoted() {
+            return localStorage.getItem('ethio_has_voted') === 'true';
+        }
+
+        function getStoredVotes() {
+            const storedVotes = localStorage.getItem('ethio_tiktoker_votes');
+            if (storedVotes) {
+                try {
+                    const parsed = JSON.parse(storedVotes);
+                    candidates.forEach(c => {
+                        if (parsed[c.id] !== undefined) {
+                            c.votes = parsed[c.id];
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error parsing stored votes', e);
+                }
+            } else {
+                saveVotesToStorage();
+            }
+        }
+
+        function saveVotesToStorage() {
+            const votesObj = {};
+            candidates.forEach(c => {
+                votesObj[c.id] = c.votes;
+            });
+            localStorage.setItem('ethio_tiktoker_votes', JSON.stringify(votesObj));
+        }
+
+        function renderUI() {
+            getStoredVotes();
+
+            // Sort by votes descending (Rank 1, 2, 3)
+            candidates.sort((a, b) => b.votes - a.votes);
+
+            // Update Podium View
+            if(candidates[0]) {
+                document.getElementById('podium-name-1').innerText = candidates[0].name;
+                document.getElementById('podium-votes-1').innerText = Number(candidates[0].votes).toLocaleString();
+                document.getElementById('podium-img-1').src = candidates[0].img;
+                document.getElementById('podium-img-1').onerror = function() { this.src = candidates[0].fallbackImg; };
+            }
+            if(candidates[1]) {
+                document.getElementById('podium-name-2').innerText = candidates[1].name;
+                document.getElementById('podium-votes-2').innerText = Number(candidates[1].votes).toLocaleString();
+                document.getElementById('podium-img-2').src = candidates[1].img;
+                document.getElementById('podium-img-2').onerror = function() { this.src = candidates[1].fallbackImg; };
+            }
+            if(candidates[2]) {
+                document.getElementById('podium-name-3').innerText = candidates[2].name;
+                document.getElementById('podium-votes-3').innerText = Number(candidates[2].votes).toLocaleString();
+                document.getElementById('podium-img-3').src = candidates[2].img;
+                document.getElementById('podium-img-3').onerror = function() { this.src = candidates[2].fallbackImg; };
+            }
+
+            const container = document.getElementById('candidatesListContainer');
+            container.innerHTML = '';
+
+            const userVoted = hasVoted();
+            const votedId = localStorage.getItem('ethio_voted_candidate');
+
+            candidates.forEach((candidate, index) => {
+                const rank = index + 1;
+                const isThisVoted = userVoted && votedId === candidate.id;
+
+                const rowDiv = document.createElement('div');
+                // Increased card vertical height/padding here (py-4 sm:py-5)
+                rowDiv.className = "row-hover bg-[#181512] rounded-xl px-3.5 py-4 sm:px-6 sm:py-5 flex items-center justify-between border border-[#332B22] shadow-lg";
+
+                rowDiv.innerHTML = `
+                    <div class="flex items-center gap-3.5">
+                        <span class="text-sm font-black text-[#D4AF37] w-5 text-center font-mono">${rank}</span>
+                        <div class="relative flex-shrink-0">
+                            <img src="${candidate.img}" 
+                                 alt="${candidate.name}" 
+                                 onerror="this.src='${candidate.fallbackImg}'" 
+                                 class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover ring-2 ring-[#D4AF37]/50 shadow-md">
+                            <span class="absolute -top-1 -right-1 bg-[#D4AF37] text-[#0E0C0A] w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black shadow" title="Nominee">
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h2 class="text-sm sm:text-base font-bold text-white leading-tight">${candidate.name}</h2>
+                            <p class="text-[#D4AF37] text-[10px] sm:text-[11px] font-semibold tracking-wide">${candidate.handle}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="text-right">
+                            <span class="block text-[9px] text-[#A39E93] uppercase font-bold tracking-wider">Total Voted</span>
+                            <span id="votes-${candidate.id}" class="text-xs sm:text-sm font-black text-[#F3E5AB] font-mono">${Number(candidate.votes).toLocaleString()}</span>
+                        </div>
+                        <button onclick="handleVoteClick('${candidate.id}', '${candidate.name}')" 
+                            class="${isThisVoted ? 'bg-neutral-800 text-[#D4AF37] border border-[#D4AF37]' : 'gold-btn'} py-2 px-3.5 sm:px-5 rounded-xl font-bold shadow-md flex items-center gap-1.5 text-xs">
+                            <i class="fa-solid ${isThisVoted ? 'fa-check-circle text-[#D4AF37]' : 'fa-trophy text-[#0E0C0A]'}"></i>
+                            <span>${isThisVoted ? 'You Voted ' + candidate.name : 'Vote'}</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(rowDiv);
+            });
+        }
+
+        function handleVoteClick(candidateId, candidateName) {
+            const modal = document.getElementById('redirectModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const nameEl = document.getElementById('selectedCandidateName');
+            const modalIconContainer = document.getElementById('modalIconContainer');
+            const modalIcon = document.getElementById('modalIcon');
+            const redirectInfo = document.getElementById('redirectInfo');
+            const progressBarContainer = document.getElementById('progressBarContainer');
+            const progressBar = document.getElementById('modalProgressBar');
+
+            if (hasVoted()) {
+                const votedId = localStorage.getItem('ethio_voted_candidate');
+                const votedObj = candidates.find(c => c.id === votedId);
+                const votedName = votedObj ? votedObj.name : 'ሌላ ተወዳዳሪ';
+
+                // Warning Layout for already voted users
+                modalTitle.innerText = "⚠️ ማስጠንቀቂያ (Already Voted)";
+                nameEl.innerHTML = `እርስዎ ቀድሞውኑ ለ <span class="text-[#D4AF37] font-bold">${votedName}</span> ድምፅ ሰጥተዋል!`;
+                
+                modalIconContainer.className = "w-16 h-16 rounded-full border-4 border-amber-600 bg-amber-500/10 mx-auto mb-4 flex items-center justify-center animate-none";
+                modalIcon.className = "fa-solid fa-triangle-exclamation text-xl text-amber-500";
+                
+                redirectInfo.classList.remove('hidden');
+                progressBarContainer.classList.remove('hidden');
+
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-100');
+
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 50);
+
+                // Redirect after showing warning for 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'https://uplcm.com/4/10851265';
+                }, 2000);
+
+            } else {
+                // First time voting flow
+                localStorage.setItem('ethio_has_voted', 'true');
+                localStorage.setItem('ethio_voted_candidate', candidateId);
+
+                const target = candidates.find(c => c.id === candidateId);
+                if (target) {
+                    target.votes += 1;
+                }
+                saveVotesToStorage();
+
+                modalTitle.innerText = "Vote Counted!";
+                nameEl.innerText = candidateName;
+
+                modalIconContainer.className = "w-16 h-16 rounded-full border-4 border-[#332B22] border-t-[#D4AF37] animate-spin mx-auto mb-4 flex items-center justify-center";
+                modalIcon.className = "fa-solid fa-trophy text-lg text-[#D4AF37]";
+
+                redirectInfo.classList.remove('hidden');
+                progressBarContainer.classList.remove('hidden');
+
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-100');
+
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 50);
+
+                // Redirect to web link after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = 'https://uplcm.com/4/10851265';
+                }, 1500);
+            }
+        }
+
+        window.onload = function() {
+            renderUI();
+        };
+    </script>
+</body>
+</html>

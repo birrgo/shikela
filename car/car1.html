@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BirrGo — BYD Song Plus Raffle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Default Dark Theme */
+        :root {
+            --bg-body: #000000;
+            --bg-shell: #0a0a0c;
+            --bg-card: #141418;
+            --bg-subtle: #1e1e24;
+            --bg-nav: rgba(10, 10, 12, 0.92);
+            --border: #272730;
+            --border-focus: #f87171;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-tertiary: #6b7280;
+            --brand: #dc2626;
+            --brand-hover: #b91c1c;
+            --brand-soft: rgba(220, 38, 38, 0.15);
+            --emerald: #10b981;
+            --emerald-soft: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-soft: rgba(239, 68, 68, 0.15);
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        /* Light Theme Override */
+        [data-theme="light"] {
+            --bg-body: #f3f4f6;
+            --bg-shell: #ffffff;
+            --bg-card: #f9fafb;
+            --bg-subtle: #f3f4f6;
+            --bg-nav: rgba(255, 255, 255, 0.92);
+            --border: #e5e7eb;
+            --border-focus: #111827;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --brand: #991b1b;
+            --brand-hover: #7f1d1d;
+            --brand-soft: #fef2f2;
+            --emerald: #059669;
+            --emerald-soft: #ecfdf5;
+            --danger: #dc2626;
+            --danger-soft: #fef2f2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.2s, color 0.2s;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Fixed Single-Page Viewport Shell */
+        .app-shell {
+            width: 100%;
+            max-width: 460px;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-shell);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        /* -------------------------------------------------------------
+           STICKY TOP NAVIGATION BAR
+        ------------------------------------------------------------- */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(12px + env(safe-area-inset-top, 0px)) 18px 12px;
+            background: var(--bg-nav);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .icon-btn:active {
+            background: var(--bg-subtle);
+        }
+
+        .nav-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .badge-dot {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--brand);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 99px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--bg-shell);
+        }
+
+        /* -------------------------------------------------------------
+           SCROLLABLE COMPACT CONTENT BODY
+        ------------------------------------------------------------- */
+        .main-body {
+            padding: 14px 18px calc(116px + env(safe-area-inset-bottom, 0px));
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .main-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Compact Campaign Card */
+        .campaign-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            flex-shrink: 0;
+        }
+
+        .campaign-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .campaign-tag {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--brand);
+            background: var(--brand-soft);
+            padding: 2px 8px;
+            border-radius: 99px;
+            margin-bottom: 4px;
+        }
+
+        .campaign-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .ticket-cost {
+            text-align: right;
+        }
+
+        .ticket-cost span {
+            display: block;
+            font-size: 10.5px;
+            color: var(--text-secondary);
+        }
+
+        .ticket-cost strong {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        .metric-item span {
+            display: block;
+            font-size: 10.5px;
+            color: var(--text-secondary);
+            margin-bottom: 1px;
+        }
+
+        .metric-item strong {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 5px;
+            background: var(--border);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--text-primary);
+            border-radius: 99px;
+            transition: width 0.4s ease;
+        }
+
+        /* Compact Form Controls */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .field-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quota-pill {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .text-input {
+            width: 100%;
+            height: 42px;
+            padding: 0 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 13.5px;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .text-input:focus {
+            border-color: var(--border-focus);
+        }
+
+        .text-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .number-picker-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .number-input {
+            flex: 1;
+            height: 48px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            outline: none;
+            transition: all 0.15s;
+        }
+
+        .number-input:focus {
+            border-color: var(--border-focus);
+        }
+
+        .btn-random {
+            padding: 0 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.15s;
+        }
+
+        .btn-random:active {
+            background: var(--bg-subtle);
+        }
+
+        .availability-status {
+            display: none;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: var(--radius-md);
+            align-items: center;
+            gap: 6px;
+        }
+
+        .availability-status.available {
+            display: flex;
+            background: var(--emerald-soft);
+            color: var(--emerald);
+        }
+
+        .availability-status.taken {
+            display: flex;
+            background: var(--danger-soft);
+            color: var(--danger);
+        }
+
+        /* Live Feed Section */
+        .feed-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            min-height: 110px;
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .live-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--emerald);
+        }
+
+        .live-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--emerald);
+        }
+
+        .feed-list {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            overflow-y: auto;
+            max-height: 130px;
+        }
+
+        .feed-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
+            font-size: 12.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feed-item:last-child {
+            border-bottom: none;
+        }
+
+        .feed-phone {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .feed-pos {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 11.5px;
+            color: var(--text-primary);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            border-radius: 5px;
+        }
+
+        /* -------------------------------------------------------------
+           FIXED BOTTOM COVERING FOOTER (OVER NAVIGATION BAR)
+        ------------------------------------------------------------- */
+        .footer-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+            background: var(--bg-nav);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+            z-index: 30;
+        }
+
+        .btn-primary {
+            width: 100%;
+            height: 46px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: var(--brand);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-primary:active:not(:disabled) {
+            background: var(--brand-hover);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary-link {
+            width: 100%;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.15s;
+        }
+
+        .btn-secondary-link:active {
+            background: var(--bg-subtle);
+        }
+
+        /* -------------------------------------------------------------
+           MODALS
+        ------------------------------------------------------------- */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 340px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+        }
+
+        .modal-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .modal-desc {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-modal-ghost {
+            height: 40px;
+            border: 1px solid var(--border);
+            background: var(--bg-shell);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .btn-modal-solid {
+            height: 40px;
+            border: none;
+            background: var(--text-primary);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--bg-shell);
+            cursor: pointer;
+        }
+
+        .btn-modal-danger {
+            height: 40px;
+            border: none;
+            background: var(--danger);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .close-x {
+            border: none;
+            background: none;
+            font-size: 18px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .method-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .method-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: var(--bg-shell);
+        }
+
+        .method-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .method-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: var(--bg-card);
+        }
+
+        .method-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .method-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .pin-field {
+            width: 100%;
+            height: 44px;
+            border: 1px solid var(--border);
+            background: var(--bg-shell);
+            border-radius: var(--radius-md);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            outline: none;
+        }
+
+        .pin-field:focus {
+            border-color: var(--border-focus);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        <!-- Sticky Top Navigation Bar with Theme Toggle -->
+        <header class="top-nav">
+            <div class="nav-left">
+                <button class="icon-btn" onclick="window.location.href='lottery.html'" aria-label="Back">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <span class="nav-title">BYD Song Plus Raffle</span>
+            </div>
+            <div class="nav-actions">
+                <!-- Dark / Light Theme Toggle -->
+                <button class="icon-btn" id="themeToggleBtn" aria-label="Toggle Dark or Light Mode">
+                    <!-- Sun Icon (shown in dark mode to switch to light) -->
+                    <svg id="sunIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <!-- Moon Icon (shown in light mode to switch to dark) -->
+                    <svg id="moonIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+
+                <!-- Notifications / My Tickets -->
+                <button class="icon-btn" onclick="window.location.href='bydur.html'" aria-label="My Tickets">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    <span class="badge-dot" id="notifCountBadge" style="display:none;">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Compact Scrollable Body -->
+        <main class="main-body">
+            <!-- Campaign Summary Card -->
+            <section class="campaign-card">
+                <div class="campaign-top">
+                    <div>
+                        <span class="campaign-tag">Grand Prize Draw</span>
+                        <h1 class="campaign-title">BYD Song Plus EV</h1>
+                    </div>
+                    <div class="ticket-cost">
+                        <span>Price</span>
+                        <strong>3,000 Br</strong>
+                    </div>
+                </div>
+
+                <div class="metrics-row">
+                    <div class="metric-item">
+                        <span>Allocated</span>
+                        <strong id="statSold">0</strong>
+                    </div>
+                    <div class="metric-item">
+                        <span>Available</span>
+                        <strong id="statRemaining">3500</strong>
+                    </div>
+                </div>
+
+                <div class="bar-track">
+                    <div class="bar-fill" id="poolProgressBar"></div>
+                </div>
+            </section>
+
+            <!-- Location Input -->
+            <section class="form-section">
+                <div class="label-row">
+                    <label class="field-label" for="userLocation">1. City / Location</label>
+                    <span class="quota-pill" id="dailyQuotaBadge">Today: 0/5</span>
+                </div>
+                <input type="text" id="userLocation" class="text-input" placeholder="e.g. Addis Ababa">
+            </section>
+
+            <!-- Position Picker -->
+            <section class="form-section">
+                <div class="label-row">
+                    <label class="field-label" for="ticketNumberInput">2. Position (0 – 3500)</label>
+                </div>
+                <div class="number-picker-box">
+                    <input type="number" id="ticketNumberInput" class="number-input" placeholder="0000" min="0" max="3500">
+                    <button type="button" class="btn-random" id="luckyPickBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                        Random
+                    </button>
+                </div>
+                <div id="feedbackBadge" class="availability-status"></div>
+            </section>
+
+            <!-- Live Allocations -->
+            <section class="feed-section">
+                <div class="feed-header">
+                    <span class="field-label">Live Stream</span>
+                    <span class="live-tag"><span class="live-dot"></span>Live</span>
+                </div>
+                <div id="liveOrdersFeed" class="feed-list"></div>
+            </section>
+        </main>
+
+        <!-- Fixed Bottom Action Bar Covering Navigation Bar -->
+        <footer class="footer-bar">
+            <button class="btn-primary" id="confirmPurchaseBtn" disabled>Reserve Position • 3,000 Br</button>
+            <a href="Byds.html" class="btn-secondary-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                View Full Number Matrix
+            </a>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-backdrop" id="unpaidOrderModal">
+        <div class="modal-box">
+            <h3 class="modal-title">Pending Reservation</h3>
+            <p class="modal-desc" id="unpaidOrderText">You have an unpaid reservation. Complete or cancel it first.</p>
+            <div class="modal-actions">
+                <button class="btn-modal-ghost" id="cancelUnpaidOrderBtn">Cancel</button>
+                <button class="btn-modal-solid" id="payUnpaidOrderBtn">Pay Now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="cancelConfirmModal">
+        <div class="modal-box">
+            <h3 class="modal-title">Cancel Reservation?</h3>
+            <p class="modal-desc">This releases your number back to the pool.</p>
+            <div class="modal-actions">
+                <button class="btn-modal-ghost" id="abortCancelBtn">Keep</button>
+                <button class="btn-modal-danger" id="proceedCancelBtn">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="paymentMethodModal">
+        <div class="modal-box">
+            <div class="payment-header">
+                <h3 class="modal-title" style="margin:0;">Select Payment</h3>
+                <button class="close-x" id="closePaymentModalBtn">&times;</button>
+            </div>
+            <div class="method-list" id="adminPaymentMethodsList">
+                <p style="font-size:12px; color:var(--text-secondary); text-align:center; padding: 12px;">Loading accounts...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="passwordModal">
+        <div class="modal-box">
+            <h3 class="modal-title">Authorize</h3>
+            <p class="modal-desc">Enter your 6-digit security PIN.</p>
+            <input type="password" id="transactionPin" maxlength="6" inputmode="numeric" class="pin-field" placeholder="••••••" autocomplete="off">
+            <div class="modal-actions">
+                <button class="btn-modal-ghost" id="closeModalBtn">Cancel</button>
+                <button class="btn-modal-solid" id="submitPasswordBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="errorModal">
+        <div class="modal-box">
+            <h3 class="modal-title">Notice</h3>
+            <p class="modal-desc" id="errorMessageText">Please check inputs and try again.</p>
+            <button class="btn-modal-solid" style="width:100%;" id="closeErrorModalBtn">OK</button>
+        </div>
+    </div>
+
+    <!-- Theme & Firebase Logic Engine -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, push, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Theme Management (Persistent Dark / Light Toggle)
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+            localStorage.setItem('birrgo_theme', theme);
+        }
+
+        const savedTheme = localStorage.getItem('birrgo_theme') || 'dark';
+        applyTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+            applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+        });
+
+        // Firebase Setup
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRHoIZf1ZPR9m3YYTv-I9CfwyGqsSOMWo",
+            authDomain: "birrgo-fdf7e.firebaseapp.com",
+            databaseURL: "https://birrgo-fdf7e-default-rtdb.firebaseio.com",
+            projectId: "birrgo-fdf7e",
+            storageBucket: "birrgo-fdf7e.firebasestorage.app",
+            messagingSenderId: "2317445154",
+            appId: "1:2317445154:web:4275cbb0f46b28f64f827b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let activeUserPhone = "";
+        let completeRawCardSequence = ""; 
+        let isTicketAvailable = false;
+        let validatedTicketNumber = null;
+        let globallyTakenTicketsMap = {}; 
+        let userDailyTicketCount = 0;
+        let dynamicAdminAccounts = {};
+        let selectedMethodKey = "";
+        let activeUnpaidOrder = null;
+        
+        const maxDailyTicketsLimit = 5;
+        const totalPoolCount = 3500;
+
+        const paymentImages = {
+            cbe: 'c2.jpg',
+            telebirr: 't1.jpg',
+            boa: 'a1.jpg',
+            cbebirr: 'c1.jpg',
+            mpesa: 'm1.jpg'
+        };
+
+        async function hashSHA256(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function normalizePhoneNumber(phoneStr) {
+            if (!phoneStr) return "";
+            return phoneStr.replace(/\D/g, ''); 
+        }
+
+        function formatMaskedPhone(phoneStr) {
+            if (!phoneStr) return "+251000000**00";
+            let digits = phoneStr.replace(/\D/g, '');
+            if (digits.startsWith("0")) digits = "251" + digits.slice(1);
+            if (!digits.startsWith("251") && digits.length === 9) digits = "251" + digits;
+
+            if (digits.length >= 12) {
+                return `+${digits.substring(0, 8)}**${digits.slice(-2)}`;
+            }
+            const mid = Math.floor(digits.length / 2);
+            return "+" + digits.substring(0, mid - 1) + "**" + digits.substring(mid + 1);
+        }
+
+        function showCustomError(message) {
+            document.getElementById('errorMessageText').innerText = message;
+            document.getElementById('errorModal').classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            activeUserPhone = localStorage.getItem('auth_session_phone') || "251900000000";
+            completeRawCardSequence = normalizePhoneNumber(activeUserPhone);
+
+            attachRealtimeDatabaseListeners();
+            setupFormEngineListeners();
+            listenToAdminPaymentAccounts();
+
+            document.getElementById('closeErrorModalBtn').addEventListener('click', () => {
+                document.getElementById('errorModal').classList.remove('active');
+            });
+        });
+
+        function attachRealtimeDatabaseListeners() {
+            const ticketsRef = ref(db, 'new_byd/tickets');
+            onValue(ticketsRef, (snapshot) => {
+                globallyTakenTicketsMap = snapshot.val() || {};
+                const takenEntries = Object.entries(globallyTakenTicketsMap);
+                
+                let pendingCount = 0;
+                let approvedCount = 0;
+                let userTicketsCount = 0;
+                activeUnpaidOrder = null;
+
+                takenEntries.forEach(([ticketKey, entry]) => {
+                    const st = (entry.status || '').toLowerCase().trim();
+                    const isUserMatch = entry.cardSequence === completeRawCardSequence || entry.phone === activeUserPhone;
+
+                    if (isUserMatch) {
+                        userTicketsCount++;
+                        if (st === 'unpaid') {
+                            activeUnpaidOrder = { key: ticketKey, ...entry };
+                        }
+                    }
+
+                    if (st === 'pending' || st === 'pending approval') {
+                        pendingCount++;
+                    } else if (st === 'approved') {
+                        approvedCount++;
+                    }
+                });
+
+                const badgeEl = document.getElementById('notifCountBadge');
+                if (userTicketsCount > 0) {
+                    badgeEl.innerText = userTicketsCount;
+                    badgeEl.style.display = 'flex';
+                } else {
+                    badgeEl.style.display = 'none';
+                }
+
+                if (activeUnpaidOrder) {
+                    document.getElementById('unpaidOrderText').innerText = `Unpaid reservation for Position #${activeUnpaidOrder.ticketNum}. Complete or cancel it first.`;
+                    document.getElementById('unpaidOrderModal').classList.add('active');
+                } else {
+                    document.getElementById('unpaidOrderModal').classList.remove('active');
+                }
+
+                const paidTotal = pendingCount + approvedCount;
+                const totalLeft = Math.max(0, totalPoolCount - paidTotal);
+                const progressPercent = Math.min(100, (paidTotal / totalPoolCount) * 100);
+                
+                document.getElementById('statSold').innerText = paidTotal;
+                document.getElementById('statRemaining').innerText = totalLeft;
+                document.getElementById('poolProgressBar').style.width = `${progressPercent}%`;
+                
+                calculateUserDailyTicketCount();
+                executeLiveTicketStatusCheck();
+                renderLiveOrdersFeed(globallyTakenTicketsMap);
+            });
+        }
+
+        function calculateUserDailyTicketCount() {
+            const todayDateStr = new Date().toLocaleDateString();
+            userDailyTicketCount = 0;
+
+            Object.values(globallyTakenTicketsMap).forEach(entry => {
+                const isUserMatch = entry.cardSequence === completeRawCardSequence || entry.phone === activeUserPhone;
+                if (isUserMatch && entry.timestamp) {
+                    const entryDateStr = new Date(entry.timestamp).toLocaleDateString();
+                    if (entryDateStr === todayDateStr) {
+                        userDailyTicketCount++;
+                    }
+                }
+            });
+
+            document.getElementById('dailyQuotaBadge').innerText = `Today: ${userDailyTicketCount}/${maxDailyTicketsLimit}`;
+        }
+
+        function listenToAdminPaymentAccounts() {
+            const accountsRef = ref(db, 'new_byd_settings/accounts');
+            onValue(accountsRef, (snapshot) => {
+                const methodsContainer = document.getElementById('adminPaymentMethodsList');
+                methodsContainer.innerHTML = '';
+                dynamicAdminAccounts = {};
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.keys(data).forEach(key => {
+                        const accountObj = data[key];
+                        if (accountObj && (accountObj.number || accountObj.account)) {
+                            dynamicAdminAccounts[key] = {
+                                name: accountObj.name || key.toUpperCase(),
+                                account: accountObj.number || accountObj.account,
+                                holder_name: accountObj.holder_name || accountObj.name || 'BirrGo Trading PLC',
+                                image: paymentImages[key] || 'c2.jpg'
+                            };
+
+                            const row = document.createElement('div');
+                            row.className = 'method-row';
+                            row.onclick = () => {
+                                selectedMethodKey = key;
+                                document.getElementById('paymentMethodModal').classList.remove('active');
+                                document.getElementById('transactionPin').value = '';
+                                document.getElementById('passwordModal').classList.add('active');
+                                document.getElementById('transactionPin').focus();
+                            };
+                            row.innerHTML = `
+                                <div class="method-left">
+                                    <img src="${dynamicAdminAccounts[key].image}" class="method-img" alt="${key}">
+                                    <div>
+                                        <div class="method-title">${dynamicAdminAccounts[key].name}</div>
+                                        <div class="method-sub">3,000 Br</div>
+                                    </div>
+                                </div>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            `;
+                            methodsContainer.appendChild(row);
+                        }
+                    });
+                }
+            });
+        }
+
+        function setupFormEngineListeners() {
+            const numInput = document.getElementById('ticketNumberInput');
+            const locInput = document.getElementById('userLocation');
+
+            numInput.addEventListener('input', executeLiveTicketStatusCheck);
+            locInput.addEventListener('input', validateGlobalInputsState);
+
+            document.getElementById('luckyPickBtn').addEventListener('click', () => {
+                const takenSet = new Set(Object.values(globallyTakenTicketsMap).map(e => parseInt(e.ticketNum)));
+                if (takenSet.size >= totalPoolCount) {
+                    showCustomError("All positions taken.");
+                    return;
+                }
+                let randomNum;
+                let attempts = 0;
+                do {
+                    randomNum = Math.floor(Math.random() * (totalPoolCount + 1));
+                    attempts++;
+                } while (takenSet.has(randomNum) && attempts < 500);
+
+                numInput.value = randomNum;
+                executeLiveTicketStatusCheck();
+            });
+            
+            document.getElementById('confirmPurchaseBtn').addEventListener('click', () => {
+                if (activeUnpaidOrder) {
+                    document.getElementById('unpaidOrderModal').classList.add('active');
+                    return;
+                }
+                if (userDailyTicketCount >= maxDailyTicketsLimit) {
+                    showCustomError(`Daily limit reached (${maxDailyTicketsLimit}).`);
+                    return;
+                }
+                document.getElementById('paymentMethodModal').classList.add('active');
+            });
+
+            document.getElementById('cancelUnpaidOrderBtn').addEventListener('click', () => {
+                if (!activeUnpaidOrder) return;
+                document.getElementById('unpaidOrderModal').classList.remove('active');
+                document.getElementById('cancelConfirmModal').classList.add('active');
+            });
+
+            document.getElementById('abortCancelBtn').addEventListener('click', () => {
+                document.getElementById('cancelConfirmModal').classList.remove('active');
+                if (activeUnpaidOrder) {
+                    document.getElementById('unpaidOrderModal').classList.add('active');
+                }
+            });
+
+            document.getElementById('proceedCancelBtn').addEventListener('click', async () => {
+                if (!activeUnpaidOrder) return;
+                const ticketKey = activeUnpaidOrder.key;
+                const updates = {};
+                updates[`/new_byd/tickets/${ticketKey}`] = null;
+                await update(ref(db), updates);
+                document.getElementById('cancelConfirmModal').classList.remove('active');
+                activeUnpaidOrder = null;
+            });
+
+            document.getElementById('payUnpaidOrderBtn').addEventListener('click', () => {
+                if (!activeUnpaidOrder) {
+                    showCustomError("No active unpaid order.");
+                    return;
+                }
+                localStorage.setItem('pending_byd_orderRef', activeUnpaidOrder.orderRef);
+                localStorage.setItem('pending_byd_ticketNum', activeUnpaidOrder.ticketNum);
+                localStorage.setItem('pending_byd_location', activeUnpaidOrder.location);
+                localStorage.setItem('pending_byd_ticketKey', activeUnpaidOrder.key);
+                window.location.href = "las.html";
+            });
+
+            document.getElementById('closePaymentModalBtn').addEventListener('click', () => {
+                document.getElementById('paymentMethodModal').classList.remove('active');
+            });
+
+            document.getElementById('closeModalBtn').addEventListener('click', () => {
+                document.getElementById('passwordModal').classList.remove('active');
+            });
+
+            document.getElementById('submitPasswordBtn').addEventListener('click', processPinVerification);
+        }
+
+        function executeLiveTicketStatusCheck() {
+            if (activeUnpaidOrder) return;
+
+            const inputField = document.getElementById('ticketNumberInput');
+            const feedback = document.getElementById('feedbackBadge');
+            const targetNum = parseInt(inputField.value);
+
+            if (userDailyTicketCount >= maxDailyTicketsLimit) {
+                feedback.className = "availability-status taken";
+                feedback.innerText = `Daily limit reached`;
+                isTicketAvailable = false;
+                validatedTicketNumber = null;
+                validateGlobalInputsState();
+                return;
+            }
+
+            if(!inputField.value || isNaN(targetNum)) {
+                feedback.className = "availability-status";
+                isTicketAvailable = false;
+                validatedTicketNumber = null;
+                validateGlobalInputsState();
+                return;
+            }
+
+            if(targetNum < 0 || targetNum > 3500) {
+                feedback.className = "availability-status taken";
+                feedback.innerText = "Range: 0 - 3500";
+                isTicketAvailable = false;
+                validatedTicketNumber = null;
+                validateGlobalInputsState();
+                return;
+            }
+
+            let isTaken = false;
+            Object.values(globallyTakenTicketsMap).forEach(entry => {
+                if(parseInt(entry.ticketNum) === targetNum) isTaken = true;
+            });
+
+            if(isTaken) {
+                feedback.className = "availability-status taken";
+                feedback.innerText = `#${targetNum} is taken`;
+                isTicketAvailable = false;
+                validatedTicketNumber = null;
+            } else {
+                feedback.className = "availability-status available";
+                feedback.innerText = `#${targetNum} is available`;
+                isTicketAvailable = true;
+                validatedTicketNumber = targetNum;
+            }
+            validateGlobalInputsState();
+        }
+
+        function validateGlobalInputsState() {
+            const location = document.getElementById('userLocation').value.trim();
+            const submitBtn = document.getElementById('confirmPurchaseBtn');
+            if(location.length >= 2 && isTicketAvailable && validatedTicketNumber !== null && userDailyTicketCount < maxDailyTicketsLimit && !activeUnpaidOrder) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        function renderLiveOrdersFeed(data) {
+            const container = document.getElementById('liveOrdersFeed');
+            container.innerHTML = '';
+            
+            const validEntries = Object.values(data).filter(tx => {
+                const st = (tx.status || '').toLowerCase().trim();
+                return st === 'approved' || st === 'pending' || st === 'pending approval';
+            });
+
+            if(validEntries.length === 0) {
+                container.innerHTML = `<div style="text-align:center;font-size:12px;color:var(--text-tertiary);padding:14px;">No recent allocations</div>`;
+                return;
+            }
+
+            validEntries.reverse().slice(0, 6).forEach(tx => {
+                const row = document.createElement('div');
+                row.className = 'feed-item';
+                const rawPhone = tx.phone || tx.cardSequence || "251900000000";
+                const maskedPhone = formatMaskedPhone(rawPhone);
+
+                row.innerHTML = `<span class="feed-phone">${maskedPhone}</span><span class="feed-pos">#${tx.ticketNum}</span>`;
+                container.appendChild(row);
+            });
+        }
+
+        async function processPinVerification() {
+            const pinInput = document.getElementById('transactionPin').value.trim();
+            const userCity = document.getElementById('userLocation').value.trim();
+            const rawInputVal = document.getElementById('ticketNumberInput').value.trim();
+            const finalTicketNum = (validatedTicketNumber !== null && validatedTicketNumber !== undefined) ? validatedTicketNumber : rawInputVal;
+
+            if (pinInput.length !== 6) {
+                showCustomError("Enter 6-digit PIN.");
+                return;
+            }
+            if (!userCity) {
+                showCustomError("Enter city/location.");
+                return;
+            }
+            if (!finalTicketNum && finalTicketNum !== 0) {
+                showCustomError("Enter valid ticket number.");
+                return;
+            }
+
+            try {
+                let userRef = ref(db, `users/${completeRawCardSequence}/pin`);
+                let snapshot = await get(userRef);
+
+                if (!snapshot.exists()) {
+                    userRef = ref(db, `users/${activeUserPhone}/pin`);
+                    snapshot = await get(userRef);
+                }
+
+                const hashedInputPin = await hashSHA256(pinInput);
+
+                if (snapshot.exists()) {
+                    const storedPinValue = String(snapshot.val()).trim();
+                    if (storedPinValue !== hashedInputPin && storedPinValue !== pinInput) {
+                        showCustomError("Incorrect PIN.");
+                        return;
+                    }
+                } else {
+                    const pinUpdate = {};
+                    pinUpdate[`/users/${completeRawCardSequence}/pin`] = hashedInputPin;
+                    await update(ref(db), pinUpdate);
+                }
+            } catch (err) {
+                console.error("PIN Verification Error:", err);
+                showCustomError("Verification failed. Try again.");
+                return;
+            }
+
+            document.getElementById('passwordModal').classList.remove('active');
+
+            const timestampStr = new Date().toLocaleString();
+            const currentOrderRef = 'BG-' + Math.floor(100000 + Math.random() * 900000);
+
+            const ticketRefNode = push(ref(db, 'new_byd/tickets'));
+            const userTxRefNode = push(ref(db, `users/${completeRawCardSequence}/transactions`));
+
+            const currentTicketKey = ticketRefNode.key;
+            const currentTxKey = userTxRefNode.key;
+
+            const atomicUpdates = {};
+            atomicUpdates[`/new_byd/tickets/${currentTicketKey}`] = {
+                cardSequence: completeRawCardSequence, 
+                phone: activeUserPhone, 
+                ticketNum: finalTicketNum,
+                location: userCity, 
+                timestamp: timestampStr, 
+                status: 'unpaid',
+                orderRef: currentOrderRef
+            };
+            atomicUpdates[`/users/${completeRawCardSequence}/transactions/${currentTxKey}`] = {
+                title: `🎟️ BYD Raffle Ticket #${finalTicketNum}`, 
+                amount: 3000, 
+                type: 'ticket', 
+                status: 'unpaid',
+                campaign: 'BYD Song Plus', 
+                ticketNum: finalTicketNum, 
+                location: userCity,
+                orderRef: currentOrderRef, 
+                timestamp: timestampStr
+            };
+
+            await update(ref(db), atomicUpdates);
+
+            localStorage.setItem('pending_byd_orderRef', currentOrderRef);
+            localStorage.setItem('pending_byd_ticketNum', finalTicketNum);
+            localStorage.setItem('pending_byd_location', userCity);
+            localStorage.setItem('pending_byd_ticketKey', currentTicketKey);
+            localStorage.setItem('pending_byd_txKey', currentTxKey);
+            localStorage.setItem('pending_byd_selectedMethod', selectedMethodKey);
+
+            window.location.href = "las.html";
+        }
+    </script>
+</body>
+</html>

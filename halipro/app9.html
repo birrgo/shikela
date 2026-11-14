@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="pageTitle">Loading...</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <style>
+        .btn-bounce {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.97);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Smooth Fluid Aurora Animation */
+        @keyframes auroraMove {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.15); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .aurora-blob {
+            animation: auroraMove 10s ease-in-out infinite;
+        }
+        .aurora-blob-2 {
+            animation: auroraMove 14s ease-in-out infinite reverse;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-0 sm:p-4 overflow-hidden">
+
+    <!-- Fullscreen Loading Overlay -->
+    <div id="loadingOverlay" class="absolute inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div id="loaderSpinner" class="w-10 h-10 border-3 border-slate-800 rounded-full animate-spin mb-3" style="border-top-color: #00B050;"></div>
+        <p class="text-xs font-medium text-slate-500 tracking-wider uppercase">Loading app...</p>
+    </div>
+
+    <!-- Screen Wrapper / Outer Phone Viewport Frame (Strict 9:16 Aspect Ratio) -->
+    <div class="relative w-full max-w-[390px] h-screen sm:h-[844px] aspect-[9/16] bg-slate-950 sm:rounded-[40px] shadow-2xl border-0 sm:border-[8px] border-slate-800 flex flex-col justify-between overflow-hidden relative">
+
+        <!-- Professional Animated Aurora Mesh Background (Dynamic Color) -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-40 blur-[80px]">
+            <div id="auroraBlob1" class="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] rounded-full aurora-blob transition-all duration-700" style="background-color: #00B050;"></div>
+            <div id="auroraBlob2" class="absolute top-[30%] -right-[20%] w-[70%] h-[70%] rounded-full aurora-blob-2 transition-all duration-700 opacity-60" style="background-color: #008037;"></div>
+        </div>
+
+        <!-- Scrollable Full-Height Content Area -->
+        <div class="flex-1 w-full flex flex-col justify-between px-7 py-8 overflow-y-auto no-scrollbar relative z-10">
+            
+            <!-- Top Spacing -->
+            <div class="w-full h-8"></div>
+
+            <!-- Central Content Section -->
+            <div class="flex flex-col items-start text-left my-auto pt-6">
+                
+                <!-- Main Heading -->
+                <h1 id="mainHeading" class="text-[34px] font-extrabold tracking-tight leading-[1.12] mb-4 text-white">
+                    <!-- Loaded dynamically -->
+                </h1>
+
+                <!-- Subtitle -->
+                <p id="mainSubtitle" class="text-sm text-slate-400 font-normal leading-relaxed max-w-[310px]">
+                    <!-- Loaded dynamically -->
+                </p>
+
+            </div>
+
+            <!-- Bottom CTA Section -->
+            <div class="w-full flex flex-col items-center pt-4 pb-2">
+                <!-- Step Indicator Dots -->
+                <div class="flex items-center gap-1.5 mb-6">
+                    <div id="dot1" class="w-6 h-1.5 rounded-full transition-colors duration-300" style="background-color: #00B050;"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                </div>
+
+                <!-- Primary Action Button -->
+                <a id="ctaButton" href="#" class="btn-bounce w-full py-4 text-white font-bold text-base rounded-2xl shadow-xl tracking-wide text-center block focus:outline-none transition-all shadow-black/40" style="background-color: #00B050;">
+                    Get Started
+                </a>
+                
+                <!-- Copyright Footer Text -->
+                <div class="mt-5 text-center">
+                    <p id="copyrightText" class="text-[11px] text-slate-500 font-medium tracking-wide select-none">
+                        &copy; 2026 App. All rights reserved.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Firebase Realtime Sync Script -->
+    <script>
+        // Change this ID when cloning this HTML file for app2, app3 ... app100
+        const APP_ID = "app9";
+
+        const firebaseConfig = {
+            databaseURL: "https://manage-8771c-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Listen to apps/[APP_ID] in real-time
+        db.ref('apps/' + APP_ID).on('value', (appSnap) => {
+            const data = appSnap.val();
+            if (data) {
+                const color = data.themeColor || '#00B050';
+                const appName = data.name || 'App';
+
+                // Update Title
+                document.getElementById('pageTitle').textContent = appName;
+                
+                // Update Copyright Text
+                document.getElementById('copyrightText').textContent = `© 2026 ${appName}. All rights reserved.`;
+
+                // Update Headings with professional typographic balance
+                document.getElementById('mainHeading').innerHTML = `${data.heading || ''}<br><span class="tracking-tight font-black" style="color: ${color}">${data.highlightText || ''}</span>`;
+                
+                // Update Subtitle
+                document.getElementById('mainSubtitle').textContent = data.subtitle || '';
+                
+                // Update CTA Button
+                const ctaBtn = document.getElementById('ctaButton');
+                ctaBtn.textContent = data.buttonText || 'Get Started';
+                ctaBtn.href = data.buttonUrl || '#';
+                ctaBtn.style.backgroundColor = color;
+
+                // Update Dynamic Aurora Animated Background Blobs & Indicators
+                document.getElementById('auroraBlob1').style.backgroundColor = color;
+                document.getElementById('auroraBlob2').style.backgroundColor = color;
+                document.getElementById('dot1').style.backgroundColor = color;
+                document.getElementById('loaderSpinner').style.borderTopColor = color;
+
+                // Hide Loading Screen smoothly once data is fully rendered
+                const loader = document.getElementById('loadingOverlay');
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>

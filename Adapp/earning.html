@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google AdMob - Home (App 1)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Google+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background-color: #f1f3f4;
+      color: #202124;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* Top Header Bar */
+    .top-bar {
+      background-color: #ffffff;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .left-nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .hamburger {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background-color: #5f6368;
+      margin: 0 auto;
+    }
+
+    .admob-logo {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-badge {
+      font-size: 11px;
+      font-weight: 500;
+      background: #e8f0fe;
+      color: #1967d2;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .right-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-icon {
+      color: #5f6368;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #d2e3fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Page Title */
+    .page-header {
+      padding: 20px 16px 16px 16px;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-header h1 {
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: #202124;
+    }
+
+    .sync-status {
+      font-size: 11px;
+      color: #5f6368;
+    }
+
+    /* Dark Grey Earnings Card */
+    .earnings-card {
+      background-color: #616569;
+      color: #ffffff;
+      border-radius: 8px;
+      margin: 0 12px;
+      padding: 18px 18px 22px 18px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 400;
+      margin-bottom: 18px;
+      color: #f1f3f4;
+    }
+
+    .info-icon {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1.3px solid currentColor;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      opacity: 0.85;
+    }
+
+    .earnings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      row-gap: 22px;
+      column-gap: 16px;
+    }
+
+    .earning-item .label {
+      font-size: 12px;
+      color: #e8eaed;
+      margin-bottom: 6px;
+    }
+
+    .earning-item .amount {
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      letter-spacing: -0.3px;
+    }
+
+    /* Date Range Selector Bar */
+    .filter-bar {
+      padding: 14px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+      position: relative;
+    }
+
+    .calendar-icon {
+      color: #3c4043;
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .dropdown-trigger {
+      background-color: #ffffff;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #3c4043;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 270px;
+      user-select: none;
+    }
+
+    .dropdown-trigger:focus {
+      border-color: #1a73e8;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: -4px;
+      left: 0;
+      width: 280px;
+      background: #ffffff;
+      border-radius: 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+      padding: 8px 0;
+      z-index: 200;
+    }
+
+    .dropdown-menu.open {
+      display: block;
+    }
+
+    .dropdown-option {
+      padding: 13px 18px;
+      font-size: 14px;
+      color: #202124;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
+    .dropdown-option:hover {
+      background-color: #f1f3f4;
+    }
+
+    .dropdown-option.selected {
+      background-color: #e8f0fe;
+      color: #202124;
+    }
+
+    /* Ads Activity Performance Section */
+    .performance-card {
+      background-color: #ffffff;
+      padding: 18px 16px 24px 16px;
+      margin-top: 8px;
+      border-top: 1px solid #e8eaed;
+    }
+
+    .performance-title {
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #202124;
+      margin-bottom: 20px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      row-gap: 26px;
+      column-gap: 14px;
+    }
+
+    .metric-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-title {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      color: #5f6368;
+      margin-bottom: 8px;
+    }
+
+    .metric-content {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .metric-values {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-main {
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      font-size: 20px;
+      font-weight: 400;
+      color: #202124;
+      margin-bottom: 4px;
+    }
+
+    .metric-delta {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .delta-positive {
+      color: #188038;
+    }
+
+    .delta-negative {
+      color: #d93025;
+    }
+
+    .sparkline {
+      width: 68px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <header class="top-bar">
+    <div class="left-nav">
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="admob-logo">
+        <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+          <path d="M21.5 6C13.4919 6 7 12.4919 7 20.5C7 28.5081 13.4919 35 21.5 35V28.5C17.0817 28.5 13.5 24.9183 13.5 20.5C13.5 16.0817 17.0817 12.5 21.5 12.5C25.9183 12.5 29.5 16.0817 29.5 20.5V25H36V20.5C36 12.4919 29.5081 6 21.5 6Z" fill="#EA4335"/>
+          <path d="M29.5 20.5V27H36V20.5H29.5Z" fill="#FBBC04"/>
+          <circle cx="32.75" cy="31.75" r="3.25" fill="#4285F4"/>
+        </svg>
+        <span class="app-badge" id="appNameBadge">app1</span>
+      </div>
+    </div>
+    <div class="right-nav">
+      <span class="nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
+        </svg>
+      </span>
+      <div class="avatar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#5e97f6">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Home</h1>
+    <span class="sync-status" id="syncStatus">Connecting...</span>
+  </div>
+
+  <!-- Dark Grey Summary Card -->
+  <section class="earnings-card">
+    <div class="card-header">
+      <span>Total estimated earnings</span>
+      <span class="info-icon">?</span>
+    </div>
+    <div class="earnings-grid">
+      <div class="earning-item">
+        <div class="label">Today so far</div>
+        <div class="amount" id="todayEarnings">€0.00</div>
+      </div>
+      <div class="earning-item">
+        <div class="label">Yesterday</div>
+        <div class="amount" id="yesterdayEarnings">€0.00</div>
+      </div>
+      <div class="earning-item">
+        <div class="label">This month so far</div>
+        <div class="amount" id="thisMonthEarnings">€0.00</div>
+      </div>
+      <div class="earning-item">
+        <div class="label">Last month</div>
+        <div class="amount" id="lastMonthEarnings">€0.00</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="calendar-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5v-5z"/>
+      </svg>
+    </div>
+    <div class="dropdown-wrapper" id="dropdownWrapper">
+      <div class="dropdown-trigger" id="dropdownTrigger" tabindex="0">
+        <span id="selectedRangeLabel">Last 7 days vs previous 7 days</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#5f6368">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+      </div>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-option" data-value="today">Today so far</div>
+        <div class="dropdown-option" data-value="yesterday">Yesterday vs same day last week</div>
+        <div class="dropdown-option selected" data-value="7">Last 7 days vs previous 7 days</div>
+        <div class="dropdown-option" data-value="28">Last 28 days vs previous 28 days</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ads Activity Performance -->
+  <section class="performance-card">
+    <h2 class="performance-title">Ads activity performance</h2>
+
+    <div class="metrics-grid">
+      <!-- Estimated earnings -->
+      <div class="metric-box">
+        <div class="metric-title">
+          <span>Estimated earnings</span>
+          <span class="info-icon">?</span>
+        </div>
+        <div class="metric-content">
+          <div class="metric-values">
+            <div class="metric-main" id="perfEarnings">€0.00</div>
+            <div class="metric-delta delta-positive" id="perfEarningsDelta">+€0.00 (+0.00%)</div>
+          </div>
+          <svg class="sparkline" viewBox="0 0 70 36">
+            <polyline id="sparkPrevEarnings" fill="none" stroke="#c5d9f6" stroke-width="1.5" points="2,28 68,28"/>
+            <polyline id="sparkCurrEarnings" fill="none" stroke="#3367d6" stroke-width="1.8" points="2,28 68,28"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Requests -->
+      <div class="metric-box">
+        <div class="metric-title">
+          <span>Requests</span>
+          <span class="info-icon">?</span>
+        </div>
+        <div class="metric-content">
+          <div class="metric-values">
+            <div class="metric-main" id="perfRequests">0</div>
+            <div class="metric-delta delta-positive" id="perfRequestsDelta">+0 (+0.00%)</div>
+          </div>
+          <svg class="sparkline" viewBox="0 0 70 36">
+            <polyline id="sparkPrevRequests" fill="none" stroke="#c5d9f6" stroke-width="1.5" points="2,28 68,28"/>
+            <polyline id="sparkCurrRequests" fill="none" stroke="#3367d6" stroke-width="1.8" points="2,28 68,28"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Impressions -->
+      <div class="metric-box">
+        <div class="metric-title">
+          <span>Impressions</span>
+          <span class="info-icon">?</span>
+        </div>
+        <div class="metric-content">
+          <div class="metric-values">
+            <div class="metric-main" id="perfImpressions">0</div>
+            <div class="metric-delta delta-positive" id="perfImpressionsDelta">+0 (+0.00%)</div>
+          </div>
+          <svg class="sparkline" viewBox="0 0 70 36">
+            <polyline id="sparkPrevImpressions" fill="none" stroke="#c5d9f6" stroke-width="1.5" points="2,28 68,28"/>
+            <polyline id="sparkCurrImpressions" fill="none" stroke="#3367d6" stroke-width="1.8" points="2,28 68,28"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Match rate -->
+      <div class="metric-box">
+        <div class="metric-title">
+          <span>Match rate</span>
+          <span class="info-icon">?</span>
+        </div>
+        <div class="metric-content">
+          <div class="metric-values">
+            <div class="metric-main" id="perfMatchRate">0.00%</div>
+            <div class="metric-delta delta-positive" id="perfMatchRateDelta">+0.00% (+0.00%)</div>
+          </div>
+          <svg class="sparkline" viewBox="0 0 70 36">
+            <polyline id="sparkPrevMatch" fill="none" stroke="#c5d9f6" stroke-width="1.5" points="2,18 68,18"/>
+            <polyline id="sparkCurrMatch" fill="none" stroke="#3367d6" stroke-width="1.8" points="2,18 68,18"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- eCPM -->
+      <div class="metric-box">
+        <div class="metric-title">
+          <span>eCPM</span>
+          <span class="info-icon">?</span>
+        </div>
+        <div class="metric-content">
+          <div class="metric-values">
+            <div class="metric-main" id="perfEcpm">€0.00</div>
+            <div class="metric-delta delta-positive" id="perfEcpmDelta">+€0.00 (+0.00%)</div>
+          </div>
+          <svg class="sparkline" viewBox="0 0 70 36">
+            <polyline id="sparkPrevEcpm" fill="none" stroke="#c5d9f6" stroke-width="1.5" points="2,28 68,28"/>
+            <polyline id="sparkCurrEcpm" fill="none" stroke="#3367d6" stroke-width="1.8" points="2,28 68,28"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      databaseURL: "https://admin-app-f1a28-default-rtdb.firebaseio.com",
+      projectId: "admin-app-f1a28"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const app1Ref = ref(db, "apps_earnings/app1");
+    let cachedData = null;
+    let selectedRange = "7"; // Default: "Last 7 days vs previous 7 days"
+
+    // Custom Dropdown Interaction
+    const dropdownTrigger = document.getElementById("dropdownTrigger");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const selectedRangeLabel = document.getElementById("selectedRangeLabel");
+    const dropdownOptions = document.querySelectorAll(".dropdown-option");
+
+    dropdownTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("open");
+    });
+
+    dropdownOptions.forEach((option) => {
+      option.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdownOptions.forEach((opt) => opt.classList.remove("selected"));
+        option.classList.add("selected");
+
+        selectedRange = option.dataset.value;
+        selectedRangeLabel.textContent = option.textContent;
+        dropdownMenu.classList.remove("open");
+
+        if (cachedData) calculateAndRender(cachedData);
+      });
+    });
+
+    document.addEventListener("click", () => {
+      dropdownMenu.classList.remove("open");
+    });
+
+    // Date helpers (YYYY-MM-DD in local time)
+    function formatDateKey(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getDaysAgo(days) {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - days);
+      return d;
+    }
+
+    function formatCompactNumber(num) {
+      if (num >= 1_000_000) return (num / 1_000_000).toFixed(2).replace(/\.00$/, '') + 'M';
+      if (num >= 1_000) return (num / 1_000).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1') + 'K';
+      return Math.round(num).toString();
+    }
+
+    function applyDeltaStyle(el, diff, pct, prefix = '', isPercentPoint = false) {
+      const sign = diff >= 0 ? '+' : '-';
+      const absDiff = Math.abs(diff);
+      const absPct = Math.abs(pct).toFixed(2);
+
+      let formattedDiff = isPercentPoint
+        ? `${absDiff.toFixed(2)}%`
+        : prefix
+          ? `${prefix}${absDiff.toFixed(2)}`
+          : formatCompactNumber(absDiff);
+
+      el.textContent = `${sign}${formattedDiff} (${sign}${absPct}%)`;
+      el.classList.toggle('delta-positive', diff >= 0);
+      el.classList.toggle('delta-negative', diff < 0);
+    }
+
+    function renderSparkline(polylineId, values) {
+      const el = document.getElementById(polylineId);
+      if (!el || values.length === 0) return;
+
+      // Duplicate single point so single-day comparisons render a clean flat line
+      const pts = values.length === 1 ? [values[0], values[0]] : values;
+
+      const max = Math.max(...pts, 0.0001);
+      const min = Math.min(...pts, 0);
+      const range = max - min || 1;
+
+      const width = 66;
+      const height = 28;
+      const padX = 2;
+      const padY = 4;
+
+      const points = pts.map((val, idx) => {
+        const x = padX + (idx / (pts.length - 1)) * width;
+        const y = padY + height - ((val - min) / range) * height;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      el.setAttribute('points', points);
+    }
+
+    // Normalizes an entry from either `realtime` or `dailyLogs[date]`
+    function normalizeEntry(entry) {
+      if (!entry) return { profit: 0, impressions: 0, requests: 0, ecpm: 0, matchRate: 0 };
+
+      const profit = Number(entry.profit) || 0;
+      const impressions = Number(entry.impressions) || 0;
+
+      // Use explicit requests if stored; otherwise derive from matchRate or fallback to ~99.67% match
+      let requests = 0;
+      if (entry.requests !== undefined && Number(entry.requests) > 0) {
+        requests = Number(entry.requests);
+      } else if (entry.matchRate !== undefined && Number(entry.matchRate) > 0) {
+        requests = Math.round(impressions / (Number(entry.matchRate) / 100));
+      } else if (impressions > 0) {
+        requests = Math.round(impressions / 0.9967);
+      }
+
+      const ecpm = entry.ecpm !== undefined && Number(entry.ecpm) > 0
+        ? Number(entry.ecpm)
+        : (impressions > 0 ? (profit / impressions) * 1000 : 0);
+
+      const matchRate = requests > 0 ? (impressions / requests) * 100 : 0;
+
+      return { profit, impressions, requests, ecpm, matchRate };
+    }
+
+    function calculateAndRender(data) {
+      if (!data) {
+        document.getElementById('syncStatus').textContent = 'No data in app1';
+        return;
+      }
+
+      if (data.appName) {
+        document.getElementById('appNameBadge').textContent = data.appName;
+      }
+
+      const currency = data.currency || '€';
+      const logs = data.dailyLogs || {};
+      const realtime = data.realtime || null;
+
+      const now = new Date();
+      const todayKey = formatDateKey(now);
+      const yesterdayKey = formatDateKey(getDaysAgo(1));
+      const currentMonthPrefix = todayKey.slice(0, 7);
+
+      const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const lastMonthPrefix = formatDateKey(lastMonthDate).slice(0, 7);
+
+      // Helper to fetch a specific day's data (prefers live `realtime` for today if available)
+      function getDayRecord(daysAgo) {
+        const key = formatDateKey(getDaysAgo(daysAgo));
+        if (daysAgo === 0 && realtime && (Number(realtime.profit) > 0 || Number(realtime.impressions) > 0)) {
+          return normalizeEntry(realtime);
+        }
+        return normalizeEntry(logs[key]);
+      }
+
+      // 1. Top Summary Card Calculations
+      const todayData = getDayRecord(0);
+      const yesterdayData = getDayRecord(1);
+
+      let thisMonthProfit = 0;
+      let lastMonthProfit = 0;
+
+      Object.entries(logs).forEach(([dateKey, entry]) => {
+        if (dateKey === todayKey) return; // Handled via getDayRecord(0) to avoid double counting
+        const profit = Number(entry.profit) || 0;
+        if (dateKey.startsWith(currentMonthPrefix)) thisMonthProfit += profit;
+        if (dateKey.startsWith(lastMonthPrefix)) lastMonthProfit += profit;
+      });
+
+      // Add today's live earnings into "This month so far"
+      thisMonthProfit += todayData.profit;
+
+      document.getElementById('todayEarnings').textContent = `${currency}${todayData.profit.toFixed(2)}`;
+      document.getElementById('yesterdayEarnings').textContent = `${currency}${yesterdayData.profit.toFixed(2)}`;
+      document.getElementById('thisMonthEarnings').textContent = `${currency}${thisMonthProfit.toFixed(2)}`;
+      document.getElementById('lastMonthEarnings').textContent = `${currency}${lastMonthProfit.toFixed(2)}`;
+
+      // 2. Period vs Comparison Period Aggregation
+      function aggregateWindow(startDaysAgo, endDaysAgo) {
+        let profit = 0;
+        let impressions = 0;
+        let requests = 0;
+        const seriesProfit = [];
+        const impressionsSeries = [];
+        const requestsSeries = [];
+        const matchSeries = [];
+        const ecpmSeries = [];
+
+        for (let d = startDaysAgo; d >= endDaysAgo; d--) {
+          const rec = getDayRecord(d);
+
+          profit += rec.profit;
+          impressions += rec.impressions;
+          requests += rec.requests;
+
+          seriesProfit.push(rec.profit);
+          impressionsSeries.push(rec.impressions);
+          requestsSeries.push(rec.requests);
+          matchSeries.push(rec.matchRate);
+          ecpmSeries.push(rec.ecpm);
+        }
+
+        const matchRate = requests > 0 ? (impressions / requests) * 100 : 0;
+        const ecpm = impressions > 0 ? (profit / impressions) * 1000 : 0;
+
+        return {
+          profit,
+          impressions,
+          requests,
+          matchRate,
+          ecpm,
+          seriesProfit,
+          impressionsSeries,
+          requestsSeries,
+          matchSeries,
+          ecpmSeries
+        };
+      }
+
+      let curr, prev;
+
+      if (selectedRange === "today") {
+        // Today so far vs Yesterday
+        curr = aggregateWindow(0, 0);
+        prev = aggregateWindow(1, 1);
+      } else if (selectedRange === "yesterday") {
+        // Yesterday (1 day ago) vs Same day last week (8 days ago)
+        curr = aggregateWindow(1, 1);
+        prev = aggregateWindow(8, 8);
+      } else {
+        // Last N days (7 or 28) vs Previous N days
+        const periodDays = parseInt(selectedRange, 10) || 7;
+        curr = aggregateWindow(periodDays - 1, 0);
+        prev = aggregateWindow(periodDays * 2 - 1, periodDays);
+      }
+
+      const pctChange = (c, p) => (p > 0 ? ((c - p) / p) * 100 : (c > 0 ? 100 : 0));
+
+      // Update Estimated Earnings
+      document.getElementById('perfEarnings').textContent = `${currency}${curr.profit.toFixed(2)}`;
+      applyDeltaStyle(
+        document.getElementById('perfEarningsDelta'),
+        curr.profit - prev.profit,
+        pctChange(curr.profit, prev.profit),
+        currency
+      );
+      renderSparkline('sparkPrevEarnings', prev.seriesProfit);
+      renderSparkline('sparkCurrEarnings', curr.seriesProfit);
+
+      // Update Requests
+      document.getElementById('perfRequests').textContent = formatCompactNumber(curr.requests);
+      applyDeltaStyle(
+        document.getElementById('perfRequestsDelta'),
+        curr.requests - prev.requests,
+        pctChange(curr.requests, prev.requests)
+      );
+      renderSparkline('sparkPrevRequests', prev.requestsSeries);
+      renderSparkline('sparkCurrRequests', curr.requestsSeries);
+
+      // Update Impressions
+      document.getElementById('perfImpressions').textContent = formatCompactNumber(curr.impressions);
+      applyDeltaStyle(
+        document.getElementById('perfImpressionsDelta'),
+        curr.impressions - prev.impressions,
+        pctChange(curr.impressions, prev.impressions)
+      );
+      renderSparkline('sparkPrevImpressions', prev.impressionsSeries);
+      renderSparkline('sparkCurrImpressions', curr.impressionsSeries);
+
+      // Update Match Rate
+      document.getElementById('perfMatchRate').textContent = `${curr.matchRate.toFixed(2)}%`;
+      applyDeltaStyle(
+        document.getElementById('perfMatchRateDelta'),
+        curr.matchRate - prev.matchRate,
+        pctChange(curr.matchRate, prev.matchRate),
+        '',
+        true
+      );
+      renderSparkline('sparkPrevMatch', prev.matchSeries);
+      renderSparkline('sparkCurrMatch', curr.matchSeries);
+
+      // Update eCPM
+      document.getElementById('perfEcpm').textContent = `${currency}${curr.ecpm.toFixed(2)}`;
+      applyDeltaStyle(
+        document.getElementById('perfEcpmDelta'),
+        curr.ecpm - prev.ecpm,
+        pctChange(curr.ecpm, prev.ecpm),
+        currency
+      );
+      renderSparkline('sparkPrevEcpm', prev.ecpmSeries);
+      renderSparkline('sparkCurrEcpm', curr.ecpmSeries);
+
+      document.getElementById('syncStatus').textContent = 'Live';
+    }
+
+    onValue(app1Ref, (snapshot) => {
+      cachedData = snapshot.val();
+      calculateAndRender(cachedData);
+    }, (error) => {
+      console.error(error);
+      document.getElementById('syncStatus').textContent = 'Connection error';
+    });
+  </script>
+</body>
+</html>

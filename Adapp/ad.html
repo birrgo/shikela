@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App ID & Zone Direct Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 20px 16px 60px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #1e293b;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .badge {
+      background: #1e293b;
+      color: #4ade80;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .app-selector-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    select, input, textarea {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+
+    textarea.paste-area {
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 125px;
+      resize: vertical;
+      border: 1.5px dashed #16a34a;
+    }
+
+    textarea.paste-area:focus {
+      border-style: solid;
+      border-color: #38bdf8;
+    }
+
+    .table-input {
+      padding: 5px 8px;
+      font-size: 13px;
+      width: 78px;
+      text-align: right;
+    }
+
+    .table-input-appid {
+      padding: 5px 8px;
+      font-size: 13px;
+      width: 78px;
+      text-align: left;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .table-input-name {
+      padding: 5px 8px;
+      font-size: 13px;
+      width: 120px;
+      text-align: left;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+    }
+
+    .btn {
+      background-color: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #0369a1;
+    }
+
+    .btn-secondary {
+      background-color: #334155;
+      width: auto;
+      white-space: nowrap;
+    }
+
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+
+    .btn-green {
+      background-color: #16a34a;
+      margin-top: 8px;
+      font-size: 15px;
+      padding: 14px 18px;
+    }
+
+    .btn-green:hover {
+      background-color: #15803d;
+    }
+
+    .url-box {
+      margin-top: 12px;
+      padding: 10px;
+      background: #0f172a;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #38bdf8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      word-break: break-all;
+      gap: 8px;
+    }
+
+    .status-msg {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #4ade80;
+      min-height: 20px;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 8px 8px;
+      border-bottom: 1px solid #334155;
+      text-align: left;
+    }
+
+    th {
+      color: #94a3b8;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .view-toggle button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #94a3b8;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .view-toggle button.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: #0284c7;
+    }
+
+    .pill-matched {
+      background: rgba(74, 222, 128, 0.15);
+      color: #4ade80;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pill-new {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .mini-copy-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #38bdf8;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .mini-copy-btn:hover {
+      background: #334155;
+    }
+
+    /* MODAL OVERLAY UI */
+    .scan-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .scan-modal-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 380px;
+      padding: 24px 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+
+    .spinner-ring {
+      width: 44px;
+      height: 44px;
+      border: 3.5px solid #334155;
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      margin: 8px auto 16px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .alert-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 4px auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .alert-icon-error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .alert-icon-success { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
+
+    .modal-ok-btn {
+      margin-top: 18px;
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      padding: 12px;
+      border-radius: 12px;
+      width: 100%;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .modal-ok-btn:hover { background: #334155; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>App ID (app1 – app60+) Admin Panel</h1>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button type="button" id="seedAppsBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">+ Init app1–app60</button>
+      <span class="badge" id="authStatus">Database Connected</span>
+    </div>
+  </div>
+
+  <!-- View Switcher -->
+  <div class="view-toggle">
+    <button type="button" id="singleViewBtn">Single App View (app1, app2...)</button>
+    <button type="button" id="allAppsViewBtn" class="active">All Apps Overview & Bulk Paste</button>
+  </div>
+
+  <!-- SINGLE APP VIEW CONTAINER -->
+  <div id="singleAppContainer" style="display: none;">
+    <div class="card">
+      <div class="card-title">1. Select App ID (app1 – app60+)</div>
+      <div class="app-selector-row">
+        <select id="appSelect" style="flex: 1;"></select>
+      </div>
+      <div class="url-box">
+        <span id="previewUrl">earning.html?app=app1</span>
+        <button type="button" class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" id="copyUrlBtn">Copy User Link</button>
+      </div>
+    </div>
+
+    <form id="earningsForm">
+      <div class="card">
+        <div class="card-title">2. App & Real-Time Zone Information</div>
+        <div class="grid-3">
+          <div class="field">
+            <label>App ID (Database Key)</label>
+            <input type="text" id="appIdDisplay" readonly style="background: #111827; color: #4ade80; font-weight: 700;" />
+          </div>
+          <div class="field">
+            <label>App / Zone Name</label>
+            <input type="text" id="appName" />
+          </div>
+          <div class="field">
+            <label>Zone ID (Number)</label>
+            <input type="number" id="zoneId" style="background: #111827; color: #38bdf8;" />
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="field">
+            <label>Real-Time Profit (€)</label>
+            <input type="number" step="0.0001" id="thisMonth" style="background: #111827; color: #38bdf8;" />
+          </div>
+          <div class="field">
+            <label>Real-Time Impressions</label>
+            <input type="number" id="perfImpressions" style="background: #111827; color: #38bdf8;" />
+          </div>
+          <div class="field">
+            <label>Real-Time eCPM (€)</label>
+            <input type="number" step="0.0001" id="perfEcpm" style="background: #111827; color: #38bdf8;" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">3. Recorded Daily Logs (All Days Individually)</div>
+        <div style="max-height: 200px; overflow-y: auto; background: #0f172a; border-radius: 8px; padding: 4px;">
+          <table id="logsTable">
+            <tr><th>Date</th><th>Impressions</th><th>Profit</th><th>CPM</th></tr>
+          </table>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-green">Save App Changes</button>
+      <div class="status-msg" id="statusMsg"></div>
+    </form>
+  </div>
+
+  <!-- ALL APPS OVERVIEW & BULK PASTE CONTAINER -->
+  <div id="allAppsContainer">
+    <div class="card" style="border-color: #16a34a;">
+      <div class="card-title" style="color: #4ade80;">
+        <span>1. Paste Monetag Text (Sequential app1, app2, app3...)</span>
+        <button type="button" id="clearPasteBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">Clear</button>
+      </div>
+
+      <div class="field" style="margin-bottom: 6px;">
+        <textarea id="bulkPasteInput" class="paste-area" placeholder="Paste your copied Monetag table here (Ctrl+V)...&#10;&#10;Zone ID Zone Impressions Profit CPM&#10;10932921 netsa Tips 4 0.001 0.213&#10;10847840 Fikra 2 0.001 0.299"></textarea>
+      </div>
+
+      <div class="status-msg" id="scannerStatus"></div>
+
+      <!-- AUTO-FILLED PREVIEW SECTION -->
+      <div id="ocrPreviewSection" style="display: none; margin-top: 16px; border-top: 1px solid #334155; padding-top: 14px;">
+        <div class="card-title" style="color: #38bdf8; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+          <span>2. Review App IDs (app1, app2...) & Save to Firebase</span>
+          <button type="button" id="yesterdayBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; background: #0284c7; color: #fff;">📅 Insert Yesterday's Info</button>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 10px;">
+          <div class="field" style="margin-bottom: 0;">
+            <label>Log Date (Stored individually under dailyLogs)</label>
+            <input type="text" id="detectedDateInput" />
+          </div>
+          <div class="field" style="margin-bottom: 0;">
+            <label>Total Apps Ready to Save</label>
+            <input type="text" id="matchedCountDisplay" readonly style="background: #111827; color: #4ade80; font-weight: 600;" />
+          </div>
+        </div>
+
+        <div style="overflow-x: auto; max-height: 380px; overflow-y: auto; background: #0f172a; border-radius: 8px;">
+          <table id="ocrPreviewTable">
+            <thead>
+              <tr>
+                <th>App ID</th>
+                <th>Zone ID (Num)</th>
+                <th>App / Zone Name</th>
+                <th>Status</th>
+                <th style="text-align:right;">Impressions</th>
+                <th style="text-align:right;">Profit (€)</th>
+                <th style="text-align:right;">CPM (€)</th>
+              </tr>
+            </thead>
+            <tbody id="ocrPreviewBody"></tbody>
+          </table>
+        </div>
+
+        <button type="button" id="confirmSaveBulkBtn" class="btn btn-green" style="margin-top: 16px;">
+          ✅ Done — Save Under app1, app2... in Firebase
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>All Apps Live Database Overview (app1 – app60+)</span>
+        <span id="totalAppsBadge" style="color:#38bdf8; font-size:12px;">0 Apps</span>
+      </div>
+      <div style="overflow-x: auto; max-height: 520px; overflow-y: auto;">
+        <table id="allAppsTable">
+          <thead>
+            <tr>
+              <th>App ID</th>
+              <th>Zone ID</th>
+              <th>App Name</th>
+              <th>Impressions</th>
+              <th>Profit</th>
+              <th>CPM</th>
+              <th>Days Logged</th>
+              <th>User Link</th>
+            </tr>
+          </thead>
+          <tbody id="allAppsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL OVERLAY -->
+  <div class="scan-modal-backdrop" id="scanModalBackdrop">
+    <div class="scan-modal-card" id="modalVerifyingState" style="display: none; padding: 28px 20px;">
+      <div class="spinner-ring"></div>
+      <div class="modal-title" id="verifyingTitle">Saving...</div>
+      <div class="modal-subtitle" id="verifyingSubtitle">Writing data directly to Firebase...</div>
+    </div>
+
+    <div class="scan-modal-card" id="modalAlertState" style="display: none; padding: 24px 20px;">
+      <div class="alert-icon-circle alert-icon-success" id="alertIconCircle">✓</div>
+      <div class="modal-title" id="alertTitle">Success</div>
+      <div class="modal-subtitle" id="alertMessage">Data saved successfully.</div>
+      <button type="button" class="modal-ok-btn" id="modalOkBtn">OK</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs & Core Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "admin-app-f1a28.firebaseapp.com",
+      databaseURL: "https://admin-app-f1a28-default-rtdb.firebaseio.com",
+      projectId: "admin-app-f1a28",
+      storageBucket: "admin-app-f1a28.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const DEFAULT_APP_SLOTS = 60; // Supports app1 through app60+ automatically
+
+    const appSelect = document.getElementById('appSelect');
+    const previewUrl = document.getElementById('previewUrl');
+    const statusMsg = document.getElementById('statusMsg');
+    const scannerStatus = document.getElementById('scannerStatus');
+    const bulkPasteInput = document.getElementById('bulkPasteInput');
+    const detectedDateInput = document.getElementById('detectedDateInput');
+
+    const scanModalBackdrop = document.getElementById('scanModalBackdrop');
+    const modalVerifyingState = document.getElementById('modalVerifyingState');
+    const modalAlertState = document.getElementById('modalAlertState');
+    const alertTitle = document.getElementById('alertTitle');
+    const alertMessage = document.getElementById('alertMessage');
+    const modalOkBtn = document.getElementById('modalOkBtn');
+
+    const singleViewBtn = document.getElementById('singleViewBtn');
+    const allAppsViewBtn = document.getElementById('allAppsViewBtn');
+    const singleAppContainer = document.getElementById('singleAppContainer');
+    const allAppsContainer = document.getElementById('allAppsContainer');
+
+    let globalExistingApps = {}; // Keyed by app1, app2, etc.
+
+    function sortAppIds(ids) {
+      return ids.sort((a, b) => {
+        const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+        return numA - numB;
+      });
+    }
+
+    function showVerifyingModal(title, subtitle) {
+      document.getElementById('verifyingTitle').textContent = title;
+      document.getElementById('verifyingSubtitle').textContent = subtitle;
+      modalVerifyingState.style.display = 'block';
+      modalAlertState.style.display = 'none';
+      scanModalBackdrop.style.display = 'flex';
+    }
+
+    function showAlertModal(type, title, message) {
+      const iconCircle = document.getElementById('alertIconCircle');
+      iconCircle.className = `alert-icon-circle ${type === 'error' ? 'alert-icon-error' : 'alert-icon-success'}`;
+      iconCircle.textContent = type === 'error' ? '!' : '✓';
+      alertTitle.textContent = title;
+      alertMessage.textContent = message;
+      modalVerifyingState.style.display = 'none';
+      modalAlertState.style.display = 'block';
+      scanModalBackdrop.style.display = 'flex';
+    }
+
+    modalOkBtn.addEventListener('click', () => { scanModalBackdrop.style.display = 'none'; });
+
+    singleViewBtn.addEventListener('click', () => {
+      singleViewBtn.classList.add('active');
+      allAppsViewBtn.classList.remove('active');
+      singleAppContainer.style.display = 'block';
+      allAppsContainer.style.display = 'none';
+    });
+
+    allAppsViewBtn.addEventListener('click', () => {
+      allAppsViewBtn.classList.add('active');
+      singleViewBtn.classList.remove('active');
+      allAppsContainer.style.display = 'block';
+      singleAppContainer.style.display = 'none';
+      loadAllAppsOverview();
+    });
+
+    // INITIALIZE app1 TO app60 SLOTS IN FIREBASE IF NOT YET CREATED
+    document.getElementById('seedAppsBtn').addEventListener('click', async () => {
+      showVerifyingModal("Initializing Apps...", "Creating app1 through app60 slots in Firebase...");
+      try {
+        const snap = await get(ref(db, 'apps_earnings'));
+        const existing = snap.exists() ? snap.val() : {};
+        const updates = {};
+        let createdCount = 0;
+
+        for (let i = 1; i <= DEFAULT_APP_SLOTS; i++) {
+          const appKey = `app${i}`;
+          if (!existing[appKey]) {
+            updates[`apps_earnings/${appKey}`] = {
+              appId: appKey,
+              appName: `App ${i}`,
+              zoneId: 0,
+              currency: "€",
+              thisMonth: "0",
+              perfImpressions: "0",
+              perfEcpm: "0",
+              realtime: {
+                impressions: 0,
+                profit: 0,
+                ecpm: 0,
+                updatedAt: Date.now()
+              },
+              updatedAt: Date.now()
+            };
+            createdCount++;
+          }
+        }
+
+        if (createdCount > 0) {
+          await update(ref(db), updates);
+        }
+
+        showAlertModal('success', 'Ready!', `${createdCount} new app slots created (app1 – app${DEFAULT_APP_SLOTS}).`);
+        loadAppSelector();
+        loadAllAppsOverview();
+      } catch (err) {
+        console.error(err);
+        showAlertModal('error', 'Error', err.message);
+      }
+    });
+
+    // PARSE PASTED DATA & SEQUENTIALLY ASSIGN app1, app2, app3...
+    function parsePastedMonetagText(rawText, existingApps) {
+      const cleanedText = rawText
+        .replace(/,\s*(?=\d{3}\b)/g, '')
+        .replace(/[$€£]/g, ' ');
+
+      const dateMatch = cleanedText.match(/(\d{2}[./-]\d{2}[./-]\d{4}|\d{4}[./-]\d{2}[./-]\d{2})/);
+      const todayFallback = new Date().toISOString().split('T')[0];
+      const detectedDate = dateMatch ? dateMatch[0].replace(/[./]/g, '-') : todayFallback;
+
+      const rawLines = cleanedText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const mergedRows = [];
+
+      for (const line of rawLines) {
+        if (/^Zone\s*ID/i.test(line)) continue;
+        if (/^\d{7,9}\b/.test(line)) {
+          mergedRows.push(line);
+        } else if (mergedRows.length > 0) {
+          mergedRows[mergedRows.length - 1] += ' ' + line;
+        }
+      }
+
+      const parsedEntries = [];
+      let appCounter = 1;
+
+      for (const row of mergedRows) {
+        const tokens = row.split(/\s+/);
+        const zoneIdStr = tokens[0];
+        if (!/^\d{7,9}$/.test(zoneIdStr)) continue;
+
+        const zoneIdNum = parseInt(zoneIdStr, 10);
+        const restTokens = tokens.slice(1);
+        const trailingNumbers = [];
+        let splitIdx = restTokens.length;
+
+        for (let i = restTokens.length - 1; i >= 0; i--) {
+          if (/^\d+(?:\.\d+)?$/.test(restTokens[i]) && trailingNumbers.length < 3) {
+            trailingNumbers.unshift(parseFloat(restTokens[i]));
+            splitIdx = i;
+          } else if (trailingNumbers.length > 0) {
+            break;
+          }
+        }
+
+        const extractedZoneName = restTokens.slice(0, splitIdx).join(' ').trim();
+        const imp = trailingNumbers.length >= 1 ? Math.round(trailingNumbers[0]) : 0;
+        const profit = trailingNumbers.length >= 2 ? trailingNumbers[1] : 0;
+        const ecpm = trailingNumbers.length >= 3 ? trailingNumbers[2] : 0;
+
+        // Sequentially assign app1, app2, app3... based on row order
+        const assignedAppId = `app${appCounter++}`;
+
+        const existingRecord = existingApps[assignedAppId];
+        const appName = (existingRecord && existingRecord.appName && !/^App \d+$/.test(existingRecord.appName))
+          ? existingRecord.appName
+          : (extractedZoneName || `App ${assignedAppId.replace('app', '')}`);
+
+        parsedEntries.push({
+          appId: assignedAppId,
+          zoneId: zoneIdNum,
+          appName,
+          imp,
+          profit,
+          ecpm,
+          isNew: true
+        });
+      }
+
+      return { detectedDate, parsedEntries };
+    }
+
+    function runInstantAutoFill(text) {
+      if (!text || !text.trim()) {
+        document.getElementById('ocrPreviewSection').style.display = 'none';
+        scannerStatus.textContent = '';
+        return;
+      }
+
+      const { detectedDate, parsedEntries } = parsePastedMonetagText(text, globalExistingApps);
+      const count = parsedEntries.length;
+
+      if (count === 0) {
+        scannerStatus.style.color = '#f87171';
+        scannerStatus.textContent = 'No valid Zone IDs found. Ensure rows start with 7–9 digit Zone IDs.';
+        document.getElementById('ocrPreviewSection').style.display = 'none';
+        return;
+      }
+
+      renderParsedPreviewTable(detectedDate, parsedEntries);
+      scannerStatus.style.color = '#4ade80';
+      scannerStatus.textContent = `⚡ Assigned ${count} zones sequentially (app1, app2...)! Review and click Save.`;
+      document.getElementById('ocrPreviewSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    bulkPasteInput.addEventListener('input', (e) => { runInstantAutoFill(e.target.value); });
+
+    document.getElementById('yesterdayBtn').addEventListener('click', () => {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      detectedDateInput.value = yesterday;
+      scannerStatus.style.color = '#38bdf8';
+      scannerStatus.textContent = `📅 Log date set to yesterday (${yesterday}). Any previous entry for this date will be replaced.`;
+    });
+
+    document.getElementById('clearPasteBtn').addEventListener('click', () => {
+      bulkPasteInput.value = '';
+      document.getElementById('ocrPreviewSection').style.display = 'none';
+      scannerStatus.textContent = '';
+      bulkPasteInput.focus();
+    });
+
+    function renderParsedPreviewTable(detectedDate, parsedEntries) {
+      document.getElementById('ocrPreviewSection').style.display = 'block';
+      if (!detectedDateInput.value) {
+        detectedDateInput.value = detectedDate;
+      }
+      document.getElementById('matchedCountDisplay').value = `${parsedEntries.length} Apps Ready`;
+
+      const tbody = document.getElementById('ocrPreviewBody');
+      tbody.innerHTML = '';
+
+      parsedEntries.forEach(m => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td><input type="text" class="table-input-appid ocr-app-id" value="${m.appId}" /></td>
+          <td><input type="number" class="table-input ocr-zone-id" value="${m.zoneId}" style="width:95px;" /></td>
+          <td><input type="text" class="table-input-name ocr-app-name" value="${m.appName.replace(/"/g, '&quot;')}" /></td>
+          <td><span class="pill-matched">Sequential</span></td>
+          <td style="text-align:right;"><input type="number" class="table-input ocr-imp" value="${m.imp}" /></td>
+          <td style="text-align:right;"><input type="number" step="0.0001" class="table-input ocr-profit" value="${m.profit}" /></td>
+          <td style="text-align:right;"><input type="number" step="0.0001" class="table-input ocr-ecpm" value="${m.ecpm}" /></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // SAVE DIRECTLY TO FIREBASE UNDER app1, app2, app3...
+    document.getElementById('confirmSaveBulkBtn').addEventListener('click', async () => {
+      const scanDate = detectedDateInput.value.trim() || new Date().toISOString().split('T')[0];
+      const rows = document.querySelectorAll('#ocrPreviewBody tr');
+
+      if (rows.length === 0) return;
+
+      showVerifyingModal("Saving...", "Storing real-time data & daily logs under app1, app2...");
+
+      try {
+        for (const row of rows) {
+          const rawAppId = row.querySelector('.ocr-app-id').value.trim().toLowerCase();
+          const appId = /^app\d+$/.test(rawAppId) ? rawAppId : `app${rawAppId.replace(/\D/g, '') || '1'}`;
+          const zoneId = Number(row.querySelector('.ocr-zone-id').value) || 0;
+          const appName = row.querySelector('.ocr-app-name').value.trim() || appId;
+          const imp = Number(row.querySelector('.ocr-imp').value) || 0;
+          const profit = Number(row.querySelector('.ocr-profit').value) || 0;
+          const ecpm = Number(row.querySelector('.ocr-ecpm').value) || 0;
+
+          const appRef = ref(db, `apps_earnings/${appId}`);
+          const existingSnap = await get(appRef);
+          const existingData = existingSnap.exists() ? existingSnap.val() : {};
+          const existingDailyLogs = existingData.dailyLogs || {};
+
+          // 1. Individual day entry stored cleanly under dailyLogs/{date}
+          existingDailyLogs[scanDate] = {
+            impressions: imp,
+            profit: profit,
+            ecpm: ecpm
+          };
+
+          // 2. Full app node with real-time stats, numeric zoneId, all days alone, and legacy compatibility fields
+          await set(appRef, {
+            ...existingData,
+            appId: appId,
+            zoneId: zoneId,
+            appName: appName,
+            currency: "€",
+            realtime: {
+              impressions: imp,
+              profit: profit,
+              ecpm: ecpm,
+              date: scanDate,
+              updatedAt: Date.now()
+            },
+            dailyLogs: existingDailyLogs,
+            thisMonth: profit.toString(),
+            perfImpressions: imp.toString(),
+            perfEcpm: ecpm.toString(),
+            updatedAt: Date.now()
+          });
+        }
+
+        showAlertModal('success', 'Saved!', `All ${rows.length} apps saved sequentially under app1, app2... for ${scanDate}.`);
+        loadAppSelector();
+        loadAllAppsOverview();
+      } catch (err) {
+        console.error(err);
+        showAlertModal('error', 'Failed', err.message);
+      }
+    });
+
+    function loadAppSelector() {
+      get(ref(db, 'apps_earnings')).then((snapshot) => {
+        const apps = snapshot.val() || {};
+        globalExistingApps = apps;
+        appSelect.innerHTML = '';
+
+        const keySet = new Set(Object.keys(apps));
+        for (let i = 1; i <= DEFAULT_APP_SLOTS; i++) {
+          keySet.add(`app${i}`);
+        }
+
+        const sortedKeys = sortAppIds(Array.from(keySet));
+        sortedKeys.forEach(appId => {
+          const data = apps[appId] || {};
+          const opt = document.createElement('option');
+          opt.value = appId;
+          const zLabel = data.zoneId ? `Zone: ${data.zoneId}` : 'Unassigned';
+          opt.textContent = `${appId} — ${data.appName || appId} (${zLabel})`;
+          appSelect.appendChild(opt);
+        });
+
+        if (appSelect.value) loadAppData(appSelect.value);
+      });
+    }
+
+    function loadAppData(appId) {
+      previewUrl.textContent = `earning.html?app=${appId}`;
+      document.getElementById('appIdDisplay').value = appId;
+
+      get(ref(db, `apps_earnings/${appId}`)).then((snapshot) => {
+        const data = snapshot.val() || {};
+        const rt = data.realtime || {};
+
+        document.getElementById('appName').value = data.appName || `App ${appId.replace('app', '')}`;
+        document.getElementById('zoneId').value = data.zoneId || 0;
+        document.getElementById('thisMonth').value = rt.profit !== undefined ? rt.profit : (data.thisMonth || '0');
+        document.getElementById('perfImpressions').value = rt.impressions !== undefined ? rt.impressions : (data.perfImpressions || '0');
+        document.getElementById('perfEcpm').value = rt.ecpm !== undefined ? rt.ecpm : (data.perfEcpm || '0');
+
+        const logsTable = document.getElementById('logsTable');
+        logsTable.innerHTML = `<tr><th>Date</th><th>Impressions</th><th>Profit</th><th>CPM</th></tr>`;
+
+        if (data.dailyLogs) {
+          Object.keys(data.dailyLogs).sort().reverse().forEach(dateKey => {
+            const entry = data.dailyLogs[dateKey];
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${dateKey}</td><td>${entry.impressions}</td><td>€${entry.profit}</td><td>€${entry.ecpm}</td>`;
+            logsTable.appendChild(row);
+          });
+        }
+      });
+    }
+
+    function loadAllAppsOverview() {
+      const tbody = document.getElementById('allAppsTableBody');
+      tbody.innerHTML = '';
+
+      get(ref(db, 'apps_earnings')).then((snapshot) => {
+        const apps = snapshot.val() || {};
+        globalExistingApps = apps;
+
+        if (bulkPasteInput.value.trim()) {
+          runInstantAutoFill(bulkPasteInput.value);
+        }
+
+        const keys = sortAppIds(Object.keys(apps));
+        document.getElementById('totalAppsBadge').textContent = `${keys.length} Apps in DB`;
+
+        keys.forEach(appId => {
+          const data = apps[appId];
+          const rt = data.realtime || {};
+          const imp = rt.impressions !== undefined ? rt.impressions : (data.perfImpressions || 0);
+          const profit = rt.profit !== undefined ? rt.profit : (data.thisMonth || 0);
+          const ecpm = rt.ecpm !== undefined ? rt.ecpm : (data.perfEcpm || 0);
+          const daysCount = data.dailyLogs ? Object.keys(data.dailyLogs).length : 0;
+          const userLink = `earning.html?app=${appId}`;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><b style="color:#38bdf8;">${appId}</b></td>
+            <td><code>${data.zoneId || 0}</code></td>
+            <td>${data.appName || appId}</td>
+            <td>${imp}</td>
+            <td>€${profit}</td>
+            <td>€${ecpm}</td>
+            <td>${daysCount} day(s)</td>
+            <td><button type="button" class="mini-copy-btn" data-link="${userLink}">Copy ?app=${appId}</button></td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        tbody.querySelectorAll('.mini-copy-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            navigator.clipboard.writeText(btn.dataset.link);
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = `Copy ?${btn.dataset.link.split('?')[1]}`; }, 1500);
+          });
+        });
+      });
+    }
+
+    appSelect.addEventListener('change', () => loadAppData(appSelect.value));
+
+    document.getElementById('copyUrlBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(previewUrl.textContent);
+      statusMsg.style.color = '#38bdf8';
+      statusMsg.textContent = `Copied ${previewUrl.textContent} to clipboard!`;
+    });
+
+    document.getElementById('earningsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const appId = appSelect.value;
+      const snap = await get(ref(db, `apps_earnings/${appId}`));
+      const existingData = snap.exists() ? snap.val() : {};
+
+      const zoneIdNum = Number(document.getElementById('zoneId').value) || 0;
+      const profitNum = Number(document.getElementById('thisMonth').value) || 0;
+      const impNum = Number(document.getElementById('perfImpressions').value) || 0;
+      const ecpmNum = Number(document.getElementById('perfEcpm').value) || 0;
+
+      const payload = {
+        ...existingData,
+        appId: appId,
+        appName: document.getElementById('appName').value.trim(),
+        zoneId: zoneIdNum,
+        currency: "€",
+        realtime: {
+          impressions: impNum,
+          profit: profitNum,
+          ecpm: ecpmNum,
+          updatedAt: Date.now()
+        },
+        thisMonth: profitNum.toString(),
+        perfImpressions: impNum.toString(),
+        perfEcpm: ecpmNum.toString(),
+        updatedAt: Date.now()
+      };
+
+      try {
+        await set(ref(db, `apps_earnings/${appId}`), payload);
+        statusMsg.style.color = '#4ade80';
+        statusMsg.textContent = `${appId} updated successfully!`;
+        loadAllAppsOverview();
+      } catch (err) {
+        statusMsg.style.color = '#f87171';
+        statusMsg.textContent = `Error: ${err.message}`;
+      }
+    });
+
+    loadAppSelector();
+    loadAllAppsOverview();
+  </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live SMS Feed</title>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    .status-badge {
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 500;
+    }
+    #sms-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sms-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .sms-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .sender {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .message {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px 0;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Live SMS Feed</h1>
+      <span id="status" class="status-badge">Connecting...</span>
+    </header>
+    
+    <div id="sms-list">
+      <div id="empty-state" class="empty-state">Waiting for incoming messages...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // Connected to your Firebase Realtime Database
+    const firebaseConfig = {
+      databaseURL: "https://sms-forwader-42adc-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    
+    const statusEl = document.getElementById("status");
+    const listEl = document.getElementById("sms-list");
+    const emptyEl = document.getElementById("empty-state");
+
+    statusEl.textContent = "● Live";
+
+    // Listen for incoming SMS messages in real time
+    const smsQuery = query(ref(db, "incoming_sms"), limitToLast(50));
+
+    onChildAdded(smsQuery, (snapshot) => {
+      if (emptyEl) {
+        emptyEl.remove();
+      }
+
+      const data = snapshot.val();
+      if (!data) return;
+
+      const card = document.createElement("div");
+      card.className = "sms-card";
+
+      const header = document.createElement("div");
+      header.className = "sms-header";
+
+      const sender = document.createElement("span");
+      sender.className = "sender";
+      sender.textContent = data.sender || "Unknown Number";
+
+      const time = document.createElement("span");
+      time.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : "";
+
+      header.appendChild(sender);
+      header.appendChild(time);
+
+      const message = document.createElement("p");
+      message.className = "message";
+      message.textContent = data.message || "";
+
+      card.appendChild(header);
+      card.appendChild(message);
+
+      listEl.prepend(card);
+    }, (error) => {
+      console.error("Firebase read error:", error);
+      statusEl.textContent = "Error connecting";
+      statusEl.style.background = "#fee2e2";
+      statusEl.style.color = "#991b1b";
+    });
+  </script>
+</body>
+</html>

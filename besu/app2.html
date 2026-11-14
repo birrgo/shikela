@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-white">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="pageTitle">Loading...</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <style>
+        .btn-bounce {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.96);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-sans antialiased bg-white text-slate-900 min-h-screen flex items-center justify-center p-0 sm:p-4 overflow-hidden">
+
+    <!-- Fullscreen White Loading Overlay (Disappears once data loads) -->
+    <div id="loadingOverlay" class="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
+        <p class="text-sm font-semibold text-slate-500 tracking-wide">opening app...</p>
+    </div>
+
+    <!-- Screen Wrapper / Outer Phone Viewport Frame (Strict 9:16 Aspect Ratio) -->
+    <div class="relative w-full max-w-[390px] h-screen sm:h-[844px] aspect-[9/16] bg-white sm:rounded-[36px] shadow-2xl border-0 sm:border-[8px] border-slate-800 flex flex-col justify-between overflow-hidden relative">
+
+        <!-- Scrollable Full-Height Content Area -->
+        <div class="flex-1 w-full flex flex-col justify-between px-6 py-8 overflow-y-auto no-scrollbar relative z-10">
+            
+            <!-- Top Section: Dynamic Icon & Headings -->
+            <div class="flex flex-col items-center text-center my-auto pt-4">
+                
+                <!-- Dynamic Emoji App Icon Container (Read from Database) -->
+                <div class="mb-6 w-20 h-20 flex-shrink-0 transition-transform hover:scale-105 duration-300 relative">
+                    <div id="iconGlow" class="absolute inset-0 rounded-3xl blur-xl opacity-40" style="background-color: #00B050;"></div>
+                    <div id="dynamicIconContainer" class="w-full h-full relative z-10 drop-shadow-md rounded-[26px] flex items-center justify-center text-4xl" style="background-color: #00B050;">
+                        <!-- Injected dynamically from database -->
+                    </div>
+                </div>
+
+                <!-- Main Heading -->
+                <h1 id="mainHeading" class="text-3xl font-extrabold tracking-tight leading-[1.12] mb-3 text-slate-900 text-center">
+                    <!-- Loaded dynamically -->
+                </h1>
+
+                <!-- Subtitle -->
+                <p id="mainSubtitle" class="text-base text-slate-500 font-medium leading-relaxed max-w-[260px] text-center mb-6">
+                    <!-- Loaded dynamically -->
+                </p>
+
+                <!-- Privacy Card Badge -->
+                <div class="w-full bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center mb-5">
+                    <div id="shieldIcon" class="w-9 h-9 mb-2 rounded-xl flex items-center justify-center" style="background-color: #E8F8EE; color: #00B050;">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8s0 0 0 0z"/>
+                        </svg>
+                    </div>
+                    
+                    <p id="privacyDisclaimerText" class="text-xs leading-relaxed text-slate-600 font-normal">
+                        <!-- Loaded dynamically -->
+                    </p>
+                </div>
+
+                <!-- Primary Action Button -->
+                <a id="ctaButton" href="#" class="btn-bounce w-full py-4 text-white font-bold text-base rounded-2xl shadow-lg tracking-wide text-center block focus:outline-none transition-all" style="background-color: #00B050;">
+                    Get Started
+                </a>
+            </div>
+
+            <div class="w-full flex flex-col items-center mt-6 pb-2">
+                <div class="w-full h-12"></div>
+            </div>
+
+        </div>
+
+        <!-- Privacy Modal -->
+        <div id="modal" class="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end justify-center opacity-0 pointer-events-none transition-all duration-300">
+            <div id="modal-content" class="bg-white rounded-t-3xl w-full p-6 text-left shadow-2xl transform translate-y-full transition-all duration-300 border-t border-slate-100">
+                
+                <div class="flex items-center justify-between mb-4">
+                    <div id="modalIconBg" class="w-10 h-10 rounded-2xl flex items-center justify-center" style="background-color: #E8F8EE; color: #00B050;">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition-colors focus:outline-none">
+                        &#x2715;
+                    </button>
+                </div>
+
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900 mb-2">Data & Privacy</h3>
+                <p id="modal-desc" class="text-xs text-slate-600 leading-relaxed mb-6">
+                    This app is designed with privacy in mind. Your reading habits, daily session statistics, and account preferences stay safely encrypted on your device.
+                </p>
+
+                <button onclick="closeModal()" id="modalBtn" class="btn-bounce w-full py-3.5 text-white font-bold rounded-xl transition-colors text-sm" style="background-color: #00B050;">
+                    Got it, Thanks
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase Realtime Sync Script -->
+    <script>
+        // Change this ID when cloning this HTML file for app2, app3 ... app100
+        const APP_ID = "app2";
+
+        const firebaseConfig = {
+            databaseURL: "https://manage-8771c-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Listen to apps/[APP_ID] in real-time
+        db.ref('apps/' + APP_ID).on('value', (appSnap) => {
+            const data = appSnap.val();
+            if (data) {
+                const color = data.themeColor || '#00B050';
+
+                // Update Title
+                document.getElementById('pageTitle').textContent = data.name || 'Free Internet';
+                
+                // Update Headings
+                document.getElementById('mainHeading').innerHTML = `${data.heading || ''}<br><span class="tracking-tight font-black" style="color: ${color}">${data.highlightText || ''}</span>`;
+                
+                // Update Subtitle
+                document.getElementById('mainSubtitle').textContent = data.subtitle || '';
+                
+                // Update CTA Button
+                const ctaBtn = document.getElementById('ctaButton');
+                ctaBtn.textContent = data.buttonText || 'Get Started';
+                ctaBtn.href = data.buttonUrl || '#';
+                ctaBtn.style.backgroundColor = color;
+                
+                // Update Privacy Text & Link Color
+                document.getElementById('privacyDisclaimerText').innerHTML = `${data.privacyText || ''} <button onclick="openModal('privacy')" class="underline font-semibold focus:outline-none inline-block mt-0.5" style="color: ${color};" id="privacyLink">Learn about data privacy...</button>`;
+                
+                // Read & Render Emoji Icon from Database with the theme color background
+                const iconContainer = document.getElementById('dynamicIconContainer');
+                iconContainer.textContent = data.appEmoji || '📶';
+                iconContainer.style.backgroundColor = color;
+
+                // Update Theme Color on Glow & Accents
+                document.getElementById('iconGlow').style.backgroundColor = color;
+                document.getElementById('shieldIcon').style.color = color;
+                document.getElementById('shieldIcon').style.backgroundColor = color + '1A';
+                document.getElementById('modalIconBg').style.color = color;
+                document.getElementById('modalIconBg').style.backgroundColor = color + '1A';
+                document.getElementById('modalBtn').style.backgroundColor = color;
+
+                // Hide Loading Screen smoothly once data is fully rendered
+                const loader = document.getElementById('loadingOverlay');
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('translate-y-full');
+            modalContent.classList.add('translate-y-0');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            modalContent.classList.remove('translate-y-0');
+            modalContent.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }, 200);
+        }
+    </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-100">
+<html lang="en" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - App Manager</title>
+    <title>Admin Dashboard & Preview - App Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -27,128 +27,207 @@
             transform: scale(1.05);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
+        .btn-bounce {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.97);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes auroraMove {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.15); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .aurora-blob {
+            animation: auroraMove 10s ease-in-out infinite;
+        }
+        .aurora-blob-2 {
+            animation: auroraMove 14s ease-in-out infinite reverse;
+        }
     </style>
 </head>
-<body class="font-sans bg-slate-100 text-slate-800 min-h-screen p-4 sm:p-8">
+<body class="font-sans bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 flex items-center justify-center">
 
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                    App Control Center
-                </h1>
-                <p class="text-sm text-slate-500">Manage your active custom app configurations.</p>
+    <!-- Local UI Login Overlay (Never touches Firebase Database) -->
+    <div id="loginOverlay" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-black border border-slate-800 rounded-3xl p-8 shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 text-emerald-500 font-bold text-xl">🔐</div>
+                <h2 class="text-2xl font-bold tracking-tight text-white">Admin Authentication</h2>
+                <p class="text-xs text-slate-400 mt-1">Enter local credentials to unlock the control panel</p>
             </div>
-            
-            <!-- App Selector & Add Button -->
-            <div class="flex items-center gap-2 bg-white border border-slate-200 shadow-sm p-2 rounded-2xl w-full sm:w-auto">
-                <label for="appSelector" class="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-2">App:</label>
-                <select id="appSelector" onchange="switchApp(this.value)" class="bg-slate-50 text-slate-800 font-semibold text-sm rounded-xl px-3 py-2 border border-slate-200 focus:outline-none focus:border-emerald-500">
-                    <option value="app1">Loading...</option>
-                </select>
-                <button type="button" onclick="createNewApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2.5 rounded-xl transition-all shadow-sm whitespace-nowrap">+ Add App</button>
-            </div>
-        </header>
 
-        <!-- Main Configuration Form -->
-        <form id="configForm" onsubmit="saveConfig(event)" class="space-y-6 bg-white border border-slate-200 shadow-xl rounded-3xl p-6 sm:p-8">
-            
-            <!-- Grid Sections -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- App Identifier -->
+            <form onsubmit="handleLogin(event)" autocomplete="off" class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Internal App Name / Label</label>
-                    <input type="text" id="appName" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-sm font-medium">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Username</label>
+                    <input type="text" id="loginUser" required autocomplete="off" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium">
                 </div>
 
-                <!-- Main Heading -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Main Heading Line 1</label>
-                    <input type="text" id="heading" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-sm font-medium">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+                    <input type="password" id="loginPass" required autocomplete="new-password" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium">
                 </div>
 
-                <!-- Highlight Text -->
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Colored Highlight Text (Line 2)</label>
-                    <input type="text" id="highlightText" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-sm font-medium">
-                </div>
-            </div>
+                <p id="loginError" class="text-xs text-red-500 font-medium text-center hidden">Invalid username or password.</p>
 
-            <!-- Theme Color Selector Trigger Button -->
-            <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Theme Colour Palette (50 Shades)</label>
-                <input type="hidden" id="themeColor" value="#E6007A">
-                
-                <button type="button" onclick="openColorModal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 flex items-center justify-between hover:bg-slate-100 transition-colors focus:outline-none focus:border-emerald-500">
-                    <div class="flex items-center gap-3">
-                        <div id="selectedColorPreview" class="w-7 h-7 rounded-lg shadow-inner" style="background-color: #E6007A;"></div>
-                        <span id="selectedColorName" class="text-sm font-bold text-slate-800">Rani</span>
-                    </div>
-                    <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">Choose Colour (50 Options) ▾</span>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm mt-2">
+                    Access Dashboard
                 </button>
-            </div>
-
-            <!-- Subtitle -->
-            <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Subtitle / Description</label>
-                <textarea id="subtitle" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-sm font-medium resize-none"></textarea>
-            </div>
-
-            <!-- Custom Emoji Icon Input -->
-            <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">App Icon Emoji (Type from keyboard, e.g., 📶, 🌐, 🚀)</label>
-                <input type="text" id="appEmoji" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 text-2xl focus:outline-none focus:border-emerald-500" placeholder="📶">
-                <p class="text-[11px] text-slate-400 mt-1">Type any emoji directly from your keyboard.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Button Text -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Primary CTA Button Label</label>
-                    <input type="text" id="buttonText" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-sm font-medium">
-                </div>
-
-                <!-- Button URL -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Primary CTA Destination URL</label>
-                    <input type="url" id="buttonUrl" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-sm font-medium">
-                </div>
-            </div>
-
-            <!-- Privacy Text -->
-            <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Privacy Card Disclaimer Text</label>
-                <textarea id="privacyText" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-sm font-medium resize-none"></textarea>
-            </div>
-
-            <!-- Submit Button & Status -->
-            <div class="flex items-center justify-between pt-4 border-t border-slate-200">
-                <span id="statusMessage" class="text-xs font-semibold text-emerald-600 opacity-0 transition-opacity">Changes saved successfully!</span>
-                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm">
-                    Save App Configuration
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Color Picker Popup Modal (Strict 5 Columns Grid Layout for 50 Colors) -->
-    <div id="colorModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
-        <div class="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl transform scale-95 transition-all duration-300 border border-slate-100 flex flex-col max-h-[90vh]">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 flex-shrink-0">
-                <h3 class="text-base font-bold text-slate-900">Select Colour (50 Unique Shades)</h3>
-                <button type="button" onclick="closeColorModal()" class="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition-colors">✕</button>
-            </div>
-            
-            <!-- Exactly 5 Columns Grid Container -->
-            <div class="grid grid-cols-5 gap-2 overflow-y-auto p-1 pr-2 flex-1" id="colorModalGrid">
-                <!-- Dynamically populated 50 color cards -->
-            </div>
+            </form>
         </div>
     </div>
 
-    <!-- Firebase Script Configuration -->
+    <!-- Main Dashboard Container -->
+    <div id="dashboardContainer" class="max-w-7xl w-full mx-auto hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Side: Configuration Form -->
+        <div class="lg:col-span-7 bg-black border border-slate-800 shadow-2xl rounded-3xl p-6 sm:p-8">
+            <!-- Header -->
+            <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-slate-800 gap-4">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                        App Control Center
+                    </h1>
+                    <p class="text-xs text-slate-400">Manage active configurations & view live preview.</p>
+                </div>
+                
+                <!-- App Selector, Add & Delete Buttons -->
+                <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 shadow-sm p-2 rounded-2xl w-full sm:w-auto">
+                    <label for="appSelector" class="text-xs font-semibold text-slate-400 uppercase tracking-wider pl-2">App:</label>
+                    <select id="appSelector" onchange="switchApp(this.value)" class="bg-black text-slate-200 font-semibold text-sm rounded-xl px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500">
+                        <option value="app1">Loading...</option>
+                    </select>
+                    <button type="button" onclick="createNewApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2.5 rounded-xl transition-all shadow-sm whitespace-nowrap">+ Add</button>
+                    <button type="button" onclick="deleteCurrentApp()" title="Delete selected app" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-600/30 font-bold text-xs px-3 py-2.5 rounded-xl transition-all whitespace-nowrap">Delete</button>
+                </div>
+            </header>
+
+            <!-- Configuration Form -->
+            <form id="configForm" onsubmit="saveConfig(event)" class="space-y-6">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- App Identifier -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Internal App Name</label>
+                        <input type="text" id="appName" required oninput="updateLivePreview()" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium">
+                    </div>
+
+                    <!-- Main Heading -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Main Heading Line 1</label>
+                        <input type="text" id="heading" required oninput="updateLivePreview()" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium">
+                    </div>
+
+                    <!-- Highlight Text -->
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Colored Highlight Text (Line 2)</label>
+                        <input type="text" id="highlightText" required oninput="updateLivePreview()" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium">
+                    </div>
+                </div>
+
+                <!-- Theme Color Selector Trigger Button -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Theme Colour Palette</label>
+                    <input type="hidden" id="themeColor" value="#00B050">
+                    
+                    <button type="button" onclick="openColorModal()" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3.5 flex items-center justify-between hover:bg-slate-900 transition-colors focus:outline-none focus:border-emerald-500">
+                        <div class="flex items-center gap-3">
+                            <div id="selectedColorPreview" class="w-7 h-7 rounded-lg shadow-inner" style="background-color: #00B050;"></div>
+                            <span id="selectedColorName" class="text-sm font-bold text-white">Green</span>
+                        </div>
+                        <span class="text-xs font-semibold text-emerald-400 bg-emerald-950/40 px-3 py-1.5 rounded-lg border border-emerald-900/50">Choose Colour (50 Options) ▾</span>
+                    </button>
+                </div>
+
+                <!-- Subtitle -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Subtitle / Description</label>
+                    <textarea id="subtitle" rows="2" oninput="updateLivePreview()" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Button Text -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Primary CTA Button Label</label>
+                        <input type="text" id="buttonText" required oninput="updateLivePreview()" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium">
+                    </div>
+
+                    <!-- Button URL -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Primary CTA Destination URL</label>
+                        <input type="url" id="buttonUrl" required oninput="updateLivePreview()" class="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-medium">
+                    </div>
+                </div>
+
+                <!-- Submit Button & Status -->
+                <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                    <span id="statusMessage" class="text-xs font-semibold text-emerald-400 opacity-0 transition-opacity">Changes saved successfully!</span>
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm">
+                        Save App Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Side: Live Animated Preview UI -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live App Preview UI
+            </div>
+
+            <div class="relative w-full max-w-[390px] h-[780px] aspect-[9/16] bg-slate-950 rounded-[40px] shadow-2xl border-[8px] border-slate-800 flex flex-col justify-between overflow-hidden relative">
+                <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-40 blur-[80px]">
+                    <div id="previewAuroraBlob1" class="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] rounded-full aurora-blob transition-all duration-700" style="background-color: #00B050;"></div>
+                    <div id="previewAuroraBlob2" class="absolute top-[30%] -right-[20%] w-[70%] h-[70%] rounded-full aurora-blob-2 transition-all duration-700 opacity-60" style="background-color: #008037;"></div>
+                </div>
+
+                <div class="flex-1 w-full flex flex-col justify-between px-7 py-8 overflow-y-auto no-scrollbar relative z-10">
+                    <div class="w-full h-8"></div>
+
+                    <div class="flex flex-col items-start text-left my-auto pt-6">
+                        <h1 id="previewHeading" class="text-[34px] font-extrabold tracking-tight leading-[1.12] mb-4 text-white"></h1>
+                        <p id="previewSubtitle" class="text-sm text-slate-400 font-normal leading-relaxed max-w-[310px]"></p>
+                    </div>
+
+                    <div class="w-full flex flex-col items-center pt-4 pb-2">
+                        <div class="flex items-center gap-1.5 mb-6">
+                            <div id="previewDot1" class="w-6 h-1.5 rounded-full transition-colors duration-300" style="background-color: #00B050;"></div>
+                            <div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                            <div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                        </div>
+
+                        <a id="previewCtaButton" href="#" class="btn-bounce w-full py-4 text-white font-bold text-base rounded-2xl shadow-xl tracking-wide text-center block focus:outline-none transition-all shadow-black/40" style="background-color: #00B050;">
+                            Get Started
+                        </a>
+                        
+                        <div class="mt-5 text-center">
+                            <p id="previewCopyrightText" class="text-[11px] text-slate-500 font-medium tracking-wide select-none">
+                                &copy; 2026 App. All rights reserved.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Color Picker Popup Modal -->
+    <div id="colorModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-black border border-slate-800 rounded-3xl max-w-4xl w-full p-6 shadow-2xl transform scale-95 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800 flex-shrink-0">
+                <h3 class="text-base font-bold text-white">Select Colour (50 Unique Shades)</h3>
+                <button type="button" onclick="closeColorModal()" class="w-8 h-8 bg-slate-900 hover:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 transition-colors">✕</button>
+            </div>
+            <div class="grid grid-cols-5 gap-2 overflow-y-auto p-1 pr-2 flex-1" id="colorModalGrid"></div>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             databaseURL: "https://manage-8771c-default-rtdb.firebaseio.com"
@@ -158,81 +237,61 @@
 
         let currentAppId = "app1";
 
-        // Exactly 50 Distinct Work Colours
         const workColours = [
-            { name: "Rani", hex: "#E6007A" },
-            { name: "Jamli", hex: "#3B1443" },
-            { name: "Falsa", hex: "#853358" },
-            { name: "Royal Blue", hex: "#0047AB" },
-            { name: "Black", hex: "#111111" },
-            { name: "Red", hex: "#E31B23" },
-            { name: "Maroon", hex: "#630012" },
-            { name: "Paroot clr", hex: "#5E8539" },
-            { name: "Rust", hex: "#C64A13" },
-            { name: "Rama", hex: "#008B8B" },
-            { name: "Orange", hex: "#FF5F1F" },
-            { name: "Chatni clr", hex: "#224225" },
-            { name: "Indigo bright", hex: "#121858" },
-            { name: "Cream", hex: "#FDF1D6" },
-            { name: "Coffee", hex: "#3D2817" },
-            { name: "Sky", hex: "#A5D2F5" },
-            { name: "Green", hex: "#164E29" },
-            { name: "Mustard", hex: "#E69E00" },
-            { name: "Magenta", hex: "#FF00FF" },
-            { name: "Deep Violet", hex: "#2E0854" },
-            { name: "Plum", hex: "#673147" },
-            { name: "Navy Blue", hex: "#000080" },
-            { name: "Charcoal", hex: "#2C2C2C" },
-            { name: "Crimson", hex: "#DC143C" },
-            { name: "Wine", hex: "#722F37" },
-            { name: "Olive", hex: "#556B2F" },
-            { name: "Terracotta", hex: "#E2725B" },
-            { name: "Teal", hex: "#008080" },
-            { name: "Amber", hex: "#FFBF00" },
-            { name: "Forest", hex: "#0B6623" },
-            { name: "Midnight", hex: "#191970" },
-            { name: "Warm Beige", hex: "#F5F5DC" },
-            { name: "Chocolate", hex: "#7B3F00" },
-            { name: "Baby Blue", hex: "#89CFF0" },
-            { name: "Emerald", hex: "#50C878" },
-            { name: "Gold", hex: "#D4AF37" },
-            { name: "Hot Pink", hex: "#FF69B4" },
-            { name: "Dark Purple", hex: "#301934" },
-            { name: "Berry", hex: "#990033" },
-            { name: "Cobalt", hex: "#0047AB" },
-            { name: "Jet Black", hex: "#050505" },
-            { name: "Brick Red", hex: "#CB4154" },
-            { name: "Burgundy", hex: "#800020" },
-            { name: "Sage", hex: "#9DC183" },
-            { name: "Burnt Orange", hex: "#CC5500" },
-            { name: "Cyan", hex: "#00A86B" },
-            { name: "Tangerine", hex: "#F28500" },
-            { name: "Pine", hex: "#01796F" },
-            { name: "Navy Slate", hex: "#1B1B3A" },
-            { name: "Sand", hex: "#C2B280" }
+            { name: "Rani", hex: "#E6007A" }, { name: "Jamli", hex: "#3B1443" }, { name: "Falsa", hex: "#853358" },
+            { name: "Royal Blue", hex: "#0047AB" }, { name: "Black", hex: "#111111" }, { name: "Red", hex: "#E31B23" },
+            { name: "Maroon", hex: "#630012" }, { name: "Paroot clr", hex: "#5E8539" }, { name: "Rust", hex: "#C64A13" },
+            { name: "Rama", hex: "#008B8B" }, { name: "Orange", hex: "#FF5F1F" }, { name: "Chatni clr", hex: "#224225" },
+            { name: "Indigo bright", hex: "#121858" }, { name: "Cream", hex: "#FDF1D6" }, { name: "Coffee", hex: "#3D2817" },
+            { name: "Sky", hex: "#A5D2F5" }, { name: "Green", hex: "#164E29" }, { name: "Mustard", hex: "#E69E00" },
+            { name: "Magenta", hex: "#FF00FF" }, { name: "Deep Violet", hex: "#2E0854" }, { name: "Plum", hex: "#673147" },
+            { name: "Navy Blue", hex: "#000080" }, { name: "Charcoal", hex: "#2C2C2C" }, { name: "Crimson", hex: "#DC143C" },
+            { name: "Wine", hex: "#722F37" }, { name: "Olive", hex: "#556B2F" }, { name: "Terracotta", hex: "#E2725B" },
+            { name: "Teal", hex: "#008080" }, { name: "Amber", hex: "#FFBF00" }, { name: "Forest", hex: "#0B6623" },
+            { name: "Midnight", hex: "#191970" }, { name: "Warm Beige", hex: "#F5F5DC" }, { name: "Chocolate", hex: "#7B3F00" },
+            { name: "Baby Blue", hex: "#89CFF0" }, { name: "Emerald", hex: "#50C878" }, { name: "Gold", hex: "#D4AF37" },
+            { name: "Hot Pink", hex: "#FF69B4" }, { name: "Dark Purple", hex: "#301934" }, { name: "Berry", hex: "#990033" },
+            { name: "Cobalt", hex: "#0047AB" }, { name: "Jet Black", hex: "#050505" }, { name: "Brick Red", hex: "#CB4154" },
+            { name: "Burgundy", hex: "#800020" }, { name: "Sage", hex: "#9DC183" }, { name: "Burnt Orange", hex: "#CC5500" },
+            { name: "Cyan", hex: "#00A86B" }, { name: "Tangerine", hex: "#F28500" }, { name: "Pine", hex: "#01796F" },
+            { name: "Navy Slate", hex: "#1B1B3A" }, { name: "Sand", hex: "#C2B280" }
         ];
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            const err = document.getElementById('loginError');
+
+            if (user === "Admin" && pass === "0000") {
+                document.getElementById('loginUser').value = '';
+                document.getElementById('loginPass').value = '';
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('dashboardContainer').classList.remove('hidden');
+                initAppSelector();
+                loadAppData(currentAppId);
+            } else {
+                err.classList.remove('hidden');
+            }
+        }
 
         function renderColorModalGrid(selectedHex) {
             const grid = document.getElementById('colorModalGrid');
             grid.innerHTML = '';
-            
             workColours.forEach(c => {
                 const card = document.createElement('div');
                 const isSelected = c.hex.toLowerCase() === (selectedHex || '').toLowerCase();
-                
-                card.className = `color-card rounded-xl p-2 flex flex-col items-center justify-between border ${isSelected ? 'ring-2 ring-slate-900 border-transparent shadow-md bg-slate-50' : 'border-slate-200 bg-white'}`;
+                card.className = `color-card rounded-xl p-2 flex flex-col items-center justify-between border ${isSelected ? 'ring-2 ring-emerald-500 border-transparent shadow-md bg-slate-900' : 'border-slate-800 bg-black'}`;
                 card.style.height = '70px';
-                
                 card.innerHTML = `
-                    <div class="w-full h-7 rounded-lg shadow-inner border border-black/5" style="background-color: ${c.hex};"></div>
-                    <span class="text-[10px] font-semibold text-slate-700 truncate w-full text-center mt-1">${c.name}</span>
+                    <div class="w-full h-7 rounded-lg shadow-inner border border-white/5" style="background-color: ${c.hex};"></div>
+                    <span class="text-[10px] font-semibold text-slate-300 truncate w-full text-center mt-1">${c.name}</span>
                 `;
-                
                 card.onclick = () => {
                     selectColor(c.hex, c.name);
                     closeColorModal();
+                    updateLivePreview();
                 };
-                
                 grid.appendChild(card);
             });
         }
@@ -244,8 +303,7 @@
         }
 
         function openColorModal() {
-            const currentHex = document.getElementById('themeColor').value;
-            renderColorModalGrid(currentHex);
+            renderColorModalGrid(document.getElementById('themeColor').value);
             const modal = document.getElementById('colorModal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.firstElementChild.classList.remove('scale-95');
@@ -259,15 +317,36 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
         }
 
+        function updateLivePreview() {
+            const appName = document.getElementById('appName').value || 'App';
+            const heading = document.getElementById('heading').value || '';
+            const highlightText = document.getElementById('highlightText').value || '';
+            const subtitle = document.getElementById('subtitle').value || '';
+            const buttonText = document.getElementById('buttonText').value || 'Get Started';
+            const buttonUrl = document.getElementById('buttonUrl').value || '#';
+            const color = document.getElementById('themeColor').value || '#00B050';
+
+            document.getElementById('previewHeading').innerHTML = `${heading}<br><span class="tracking-tight font-black" style="color: ${color}">${highlightText}</span>`;
+            document.getElementById('previewSubtitle').textContent = subtitle;
+            
+            const previewCta = document.getElementById('previewCtaButton');
+            previewCta.textContent = buttonText;
+            previewCta.href = buttonUrl;
+            previewCta.style.backgroundColor = color;
+
+            document.getElementById('previewCopyrightText').textContent = `© 2026 ${appName}. All rights reserved.`;
+            document.getElementById('previewAuroraBlob1').style.backgroundColor = color;
+            document.getElementById('previewAuroraBlob2').style.backgroundColor = color;
+            document.getElementById('previewDot1').style.backgroundColor = color;
+        }
+
         function initAppSelector() {
             db.ref('apps').on('value', (snapshot) => {
                 const selector = document.getElementById('appSelector');
                 selector.innerHTML = '';
-                
                 const appsData = snapshot.val();
                 if (appsData) {
                     const appKeys = Object.keys(appsData);
-                    
                     appKeys.forEach(appKey => {
                         const appInfo = appsData[appKey] || {};
                         const opt = document.createElement('option');
@@ -283,8 +362,6 @@
                         selector.value = currentAppId;
                         loadAppData(currentAppId);
                     }
-                } else {
-                    createNewApp("app1");
                 }
             });
         }
@@ -300,13 +377,11 @@
                     document.getElementById('subtitle').value = data.subtitle || '';
                     document.getElementById('buttonText').value = data.buttonText || '';
                     document.getElementById('buttonUrl').value = data.buttonUrl || '';
-                    document.getElementById('privacyText').value = data.privacyText || '';
                     
-                    const colorHex = data.themeColor || '#E6007A';
+                    const colorHex = data.themeColor || '#00B050';
                     const foundColor = workColours.find(c => c.hex.toLowerCase() === colorHex.toLowerCase()) || { name: 'Custom Colour', hex: colorHex };
                     selectColor(foundColor.hex, foundColor.name);
-
-                    document.getElementById('appEmoji').value = data.appEmoji || '📶';
+                    updateLivePreview();
                 }
             });
         }
@@ -315,39 +390,42 @@
             loadAppData(appId);
         }
 
-        function createNewApp(specificId = null) {
+        function createNewApp() {
             db.ref('apps').once('value').then((snapshot) => {
                 let nextNum = 1;
                 const appsData = snapshot.val();
-                
                 if (appsData) {
                     const keys = Object.keys(appsData);
                     const numbers = keys.map(k => parseInt(k.replace('app', ''), 10)).filter(n => !isNaN(n));
-                    if (numbers.length > 0) {
-                        nextNum = Math.max(...numbers) + 1;
-                    }
+                    if (numbers.length > 0) nextNum = Math.max(...numbers) + 1;
                 }
 
-                const newId = specificId || `app${nextNum}`;
+                const newId = `app${nextNum}`;
                 const defaultData = {
-                    name: `Campaign App ${newId.replace('app', '')}`,
-                    heading: "Welcome to",
-                    highlightText: "Free Access",
-                    subtitle: "Enjoy seamless daily connection",
-                    buttonText: "Get Started",
-                    buttonUrl: "https://uplcm.com/4/10932921",
-                    privacyText: "Your privacy is protected locally.",
-                    themeColor: "#E6007A",
-                    appEmoji: "📶"
+                    name: `Campaign App ${nextNum}`,
+                    heading: "Redefine Your",
+                    highlightText: "Journey",
+                    subtitle: "Enjoy seamless daily connection & experience excellence.",
+                    buttonText: "GET STARTED",
+                    buttonUrl: "https://example.com",
+                    themeColor: "#E31B23"
                 };
 
                 db.ref('apps/' + newId).set(defaultData).then(() => {
                     currentAppId = newId;
                     loadAppData(newId);
                 }).catch(error => {
-                    alert("Failed to create app. Error: " + error.message);
+                    alert("Database write blocked by Firebase Rules. Please make sure your Firebase database rules allow read/write access: " + error.message);
                 });
             });
+        }
+
+        function deleteCurrentApp() {
+            if (confirm(`Delete ${currentAppId.toUpperCase()} permanently?`)) {
+                db.ref('apps/' + currentAppId).remove().catch(error => {
+                    alert("Database delete blocked by Firebase Rules: " + error.message);
+                });
+            }
         }
 
         function saveConfig(event) {
@@ -359,9 +437,7 @@
                 subtitle: document.getElementById('subtitle').value,
                 buttonText: document.getElementById('buttonText').value,
                 buttonUrl: document.getElementById('buttonUrl').value,
-                privacyText: document.getElementById('privacyText').value,
-                themeColor: document.getElementById('themeColor').value,
-                appEmoji: document.getElementById('appEmoji').value || '📶'
+                themeColor: document.getElementById('themeColor').value
             };
 
             db.ref('apps/' + currentAppId).set(formData).then(() => {
@@ -369,14 +445,9 @@
                 status.style.opacity = '1';
                 setTimeout(() => { status.style.opacity = '0'; }, 3000);
             }).catch(error => {
-                alert("Failed to save changes. Error: " + error.message);
+                alert("Database write blocked by Firebase Rules. Please make sure your Firebase database rules allow read/write access: " + error.message);
             });
         }
-
-        window.onload = function() {
-            initAppSelector();
-            loadAppData(currentAppId);
-        };
     </script>
 </body>
 </html>

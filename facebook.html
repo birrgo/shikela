@@ -177,7 +177,7 @@
         </select>
         <input type="datetime-local" id="scheduleDateTimeInput" class="hidden" />
 
-        <button type="button" id="uploadAndQueueBtn">Upload & Publish / Schedule</button>
+        <button type="button" id="uploadAndQueueBtn">Save & Publish / Schedule</button>
         <p id="statusMessage" style="font-weight:600; margin:6px 0 0;"></p>
       </div>
 
@@ -205,12 +205,6 @@
       remove,
       onValue
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import {
-      getStorage,
-      ref as storageRef,
-      uploadBytes,
-      getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDLpsaHZAkQaItuLnLN1d4DEj735_3Zho0",
@@ -226,7 +220,8 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-    const storage = getStorage(app);
+
+    const MAX_RAW_FILE_BYTES = 7 * 1024 * 1024; // ~7 MB raw -> ~9.3 MB Base64
 
     const loginCard = document.getElementById("loginCard");
     const appSection = document.getElementById("appSection");
@@ -245,6 +240,15 @@
     const statusMessage = document.getElementById("statusMessage");
 
     let listenersStarted = false;
+
+    function fileToBase64DataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error || new Error("Failed to read image file."));
+        reader.readAsDataURL(file);
+      });
+    }
 
     // Email + Password sign in
     emailLoginForm.addEventListener("submit", async (e) => {
@@ -330,7 +334,7 @@
       document.getElementById("pageTokenInput").value = "";
     });
 
-    // Upload image to Firebase Storage & queue post
+    // Convert full-quality image to Base64 Data URL & save to Realtime Database
     document.getElementById("uploadAndQueueBtn").addEventListener("click", async () => {
       const btn = document.getElementById("uploadAndQueueBtn");
       const file = imageFileInput.files[0];
@@ -341,6 +345,14 @@
 
       if (!file) {
         alert("Please choose an image to upload.");
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image file.");
+        return;
+      }
+      if (file.size > MAX_RAW_FILE_BYTES) {
+        alert("Image is too large for Realtime Database (keep raw files under 7 MB).");
         return;
       }
       if (selectedPages.length === 0) {
@@ -358,16 +370,15 @@
       }
 
       btn.disabled = true;
-      statusMessage.textContent = "Uploading image to Firebase Storage...";
+      statusMessage.textContent = "Converting full-quality image to Base64 Data URL...";
 
       try {
-        const filePath = `posts/${Date.now()}_${file.name}`;
-        const fileRef = storageRef(storage, filePath);
-        await uploadBytes(fileRef, file);
-        const imageUrl = await getDownloadURL(fileRef);
+        const imageUrl = await fileToBase64DataUrl(file);
 
         await set(push(ref(db, "scheduledPosts")), {
           imageUrl,
+          fileName: file.name,
+          mimeType: file.type,
           caption,
           targetPages: selectedPages,
           scheduledTime,
@@ -380,8 +391,8 @@
         document.getElementById("captionInput").value = "";
         statusMessage.textContent =
           publishTypeSelect.value === "now"
-            ? "Uploaded! Posting to all selected Facebook Pages now..."
-            : `Scheduled for ${new Date(scheduledTime).toLocaleString()}!`;
+            ? "Saved as Base64 Data URL! Queued for immediate posting..."
+            : `Saved & scheduled for ${new Date(scheduledTime).toLocaleString()}!`;
       } catch (err) {
         statusMessage.textContent = "Error: " + err.message;
       } finally {

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facebook Multi-Page Auto Poster</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f0f2f5;
+      color: #1c1e21;
+      margin: 0;
+      padding: 20px 14px;
+    }
+    .container { max-width: 780px; margin: 0 auto; }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    h1 { font-size: 1.4rem; margin: 0 0 16px; color: #1877f2; }
+    h2 { font-size: 1.1rem; margin: 0 0 12px; }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 10px 12px;
+      margin: 6px 0 12px;
+      border: 1px solid #ccd0d5;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      background: #1877f2;
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #166fe5; }
+    button:disabled { background: #9cb4d8; cursor: not-allowed; }
+    button.btn-danger {
+      background: #e41e3f;
+      width: auto;
+      padding: 6px 12px;
+      margin: 0;
+      font-size: 12px;
+    }
+    button.btn-secondary {
+      background: #4b4f56;
+      width: auto;
+      padding: 7px 14px;
+      margin: 0;
+      font-size: 13px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ebedf0;
+      gap: 10px;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+      cursor: pointer;
+    }
+    .checkbox-row input { width: auto; margin: 0; }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pending { background: #fff3cd; color: #856404; }
+    .processing { background: #cce5ff; color: #004085; }
+    .posted { background: #d4edda; color: #155724; }
+    .failed { background: #f8d7da; color: #721c24; }
+    .hidden { display: none; }
+    .preview-img {
+      max-width: 100%;
+      max-height: 220px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .thumb {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .item-left { display: flex; align-items: center; gap: 10px; }
+    small { color: #65676b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Facebook Multi-Page Auto Poster</h1>
+
+    <!-- LOGIN SECTION -->
+    <div id="loginCard" class="card">
+      <h2>Admin Sign In</h2>
+      <form id="emailLoginForm">
+        <input
+          type="email"
+          id="emailInput"
+          value="firatech2541@gmail.com"
+          placeholder="Admin Email"
+          required
+        />
+        <input
+          type="password"
+          id="passwordInput"
+          placeholder="Password"
+          required
+        />
+        <button type="submit" id="emailLoginBtn">Sign In</button>
+      </form>
+      <p id="loginError" style="color:#e41e3f; margin:6px 0 0;"></p>
+    </div>
+
+    <!-- APP DASHBOARD -->
+    <div id="appSection" class="hidden">
+      <div class="topbar">
+        <small id="userLabel"></small>
+        <button type="button" id="logoutBtn" class="btn-secondary">Sign Out</button>
+      </div>
+
+      <!-- 1. MANAGE FACEBOOK PAGES -->
+      <div class="card">
+        <h2>1. Add & Manage Facebook Pages</h2>
+        <input type="text" id="pageNameInput" placeholder="Page Name (e.g. BirrGo News)" />
+        <input type="text" id="pageIdInput" placeholder="Facebook Page ID (e.g. 109876543210)" />
+        <input type="password" id="pageTokenInput" placeholder="Long-Lived Page Access Token" />
+        <button type="button" id="addPageBtn">+ Save Facebook Page</button>
+        <div id="pagesListContainer"></div>
+      </div>
+
+      <!-- 2. UPLOAD & SCHEDULE POST -->
+      <div class="card">
+        <h2>2. Upload Image & Schedule Post</h2>
+        <label><strong>Select Image</strong></label>
+        <input type="file" id="imageFileInput" accept="image/*" />
+        <img id="imagePreview" class="preview-img" alt="Preview" />
+
+        <label><strong>Post Caption</strong></label>
+        <textarea id="captionInput" rows="3" placeholder="Write caption for all selected pages..."></textarea>
+
+        <label><strong>Target Pages</strong></label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="selectAllCheckbox" checked />
+          <strong>Select ALL Pages</strong>
+        </label>
+        <div id="pageCheckboxesContainer"></div>
+
+        <label style="display:block; margin-top:10px;"><strong>Schedule Time</strong></label>
+        <select id="publishTypeSelect">
+          <option value="now">Post Immediately</option>
+          <option value="schedule">Schedule Specific Date & Time</option>
+        </select>
+        <input type="datetime-local" id="scheduleDateTimeInput" class="hidden" />
+
+        <button type="button" id="uploadAndQueueBtn">Upload & Publish / Schedule</button>
+        <p id="statusMessage" style="font-weight:600; margin:6px 0 0;"></p>
+      </div>
+
+      <!-- 3. SCHEDULED & POSTED QUEUE -->
+      <div class="card">
+        <h2>3. Post Queue & History</h2>
+        <div id="postsListContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      push,
+      set,
+      remove,
+      onValue
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import {
+      getStorage,
+      ref as storageRef,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLpsaHZAkQaItuLnLN1d4DEj735_3Zho0",
+      authDomain: "facebook-d49ac.firebaseapp.com",
+      databaseURL: "https://facebook-d49ac-default-rtdb.firebaseio.com",
+      projectId: "facebook-d49ac",
+      storageBucket: "facebook-d49ac.firebasestorage.app",
+      messagingSenderId: "574829461616",
+      appId: "1:574829461616:web:9a6a1cad912da293d4f4b5",
+      measurementId: "G-E8RFDP367Z"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
+
+    const loginCard = document.getElementById("loginCard");
+    const appSection = document.getElementById("appSection");
+    const loginError = document.getElementById("loginError");
+    const userLabel = document.getElementById("userLabel");
+    const emailLoginForm = document.getElementById("emailLoginForm");
+    const emailLoginBtn = document.getElementById("emailLoginBtn");
+    const pagesListContainer = document.getElementById("pagesListContainer");
+    const pageCheckboxesContainer = document.getElementById("pageCheckboxesContainer");
+    const postsListContainer = document.getElementById("postsListContainer");
+    const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+    const publishTypeSelect = document.getElementById("publishTypeSelect");
+    const scheduleDateTimeInput = document.getElementById("scheduleDateTimeInput");
+    const imageFileInput = document.getElementById("imageFileInput");
+    const imagePreview = document.getElementById("imagePreview");
+    const statusMessage = document.getElementById("statusMessage");
+
+    let listenersStarted = false;
+
+    // Email + Password sign in
+    emailLoginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      loginError.textContent = "";
+      const email = document.getElementById("emailInput").value.trim();
+      const password = document.getElementById("passwordInput").value;
+
+      emailLoginBtn.disabled = true;
+      emailLoginBtn.textContent = "Signing in...";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (err) {
+        loginError.textContent = err.message;
+      } finally {
+        emailLoginBtn.disabled = false;
+        emailLoginBtn.textContent = "Sign In";
+      }
+    });
+
+    // Auth state listener
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginCard.classList.add("hidden");
+        appSection.classList.remove("hidden");
+        userLabel.innerHTML = `Signed in as <strong>${user.email}</strong><br/>UID: <code>${user.uid}</code>`;
+        if (!listenersStarted) {
+          listenersStarted = true;
+          startRealtimeListeners();
+        }
+      } else {
+        loginCard.classList.remove("hidden");
+        appSection.classList.add("hidden");
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
+
+    // Image preview
+    imageFileInput.addEventListener("change", () => {
+      const file = imageFileInput.files[0];
+      if (file) {
+        imagePreview.src = URL.createObjectURL(file);
+        imagePreview.style.display = "block";
+      } else {
+        imagePreview.style.display = "none";
+      }
+    });
+
+    // Show/hide datetime input
+    publishTypeSelect.addEventListener("change", () => {
+      scheduleDateTimeInput.classList.toggle("hidden", publishTypeSelect.value === "now");
+    });
+
+    // Select/deselect all pages
+    selectAllCheckbox.addEventListener("change", () => {
+      document.querySelectorAll(".page-target-cb").forEach((cb) => {
+        cb.checked = selectAllCheckbox.checked;
+      });
+    });
+
+    // Add Facebook Page to Realtime Database
+    document.getElementById("addPageBtn").addEventListener("click", async () => {
+      const pageName = document.getElementById("pageNameInput").value.trim();
+      const fbPageId = document.getElementById("pageIdInput").value.trim();
+      const accessToken = document.getElementById("pageTokenInput").value.trim();
+
+      if (!pageName || !fbPageId || !accessToken) {
+        alert("Please enter Page Name, Page ID, and Access Token.");
+        return;
+      }
+
+      await set(push(ref(db, "fbPages")), {
+        pageName,
+        fbPageId,
+        accessToken,
+        createdAt: Date.now()
+      });
+
+      document.getElementById("pageNameInput").value = "";
+      document.getElementById("pageIdInput").value = "";
+      document.getElementById("pageTokenInput").value = "";
+    });
+
+    // Upload image to Firebase Storage & queue post
+    document.getElementById("uploadAndQueueBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("uploadAndQueueBtn");
+      const file = imageFileInput.files[0];
+      const caption = document.getElementById("captionInput").value.trim();
+      const selectedPages = Array.from(document.querySelectorAll(".page-target-cb:checked")).map(
+        (cb) => cb.value
+      );
+
+      if (!file) {
+        alert("Please choose an image to upload.");
+        return;
+      }
+      if (selectedPages.length === 0) {
+        alert("Please select at least one Facebook Page.");
+        return;
+      }
+
+      let scheduledTime = Date.now();
+      if (publishTypeSelect.value === "schedule") {
+        if (!scheduleDateTimeInput.value) {
+          alert("Please choose a date and time.");
+          return;
+        }
+        scheduledTime = new Date(scheduleDateTimeInput.value).getTime();
+      }
+
+      btn.disabled = true;
+      statusMessage.textContent = "Uploading image to Firebase Storage...";
+
+      try {
+        const filePath = `posts/${Date.now()}_${file.name}`;
+        const fileRef = storageRef(storage, filePath);
+        await uploadBytes(fileRef, file);
+        const imageUrl = await getDownloadURL(fileRef);
+
+        await set(push(ref(db, "scheduledPosts")), {
+          imageUrl,
+          caption,
+          targetPages: selectedPages,
+          scheduledTime,
+          status: "pending",
+          createdAt: Date.now()
+        });
+
+        imageFileInput.value = "";
+        imagePreview.style.display = "none";
+        document.getElementById("captionInput").value = "";
+        statusMessage.textContent =
+          publishTypeSelect.value === "now"
+            ? "Uploaded! Posting to all selected Facebook Pages now..."
+            : `Scheduled for ${new Date(scheduledTime).toLocaleString()}!`;
+      } catch (err) {
+        statusMessage.textContent = "Error: " + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function startRealtimeListeners() {
+      // Sync Facebook Pages list
+      onValue(ref(db, "fbPages"), (snapshot) => {
+        const pages = snapshot.val() || {};
+        pagesListContainer.innerHTML = "";
+        pageCheckboxesContainer.innerHTML = "";
+
+        const entries = Object.entries(pages);
+        if (entries.length === 0) {
+          pagesListContainer.innerHTML = "<small>No Facebook Pages added yet.</small>";
+          return;
+        }
+
+        entries.forEach(([key, page]) => {
+          const row = document.createElement("div");
+          row.className = "list-item";
+          row.innerHTML = `
+            <div>
+              <strong>${page.pageName}</strong><br />
+              <small>Page ID: ${page.fbPageId}</small>
+            </div>
+          `;
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "btn-danger";
+          delBtn.textContent = "Delete";
+          delBtn.onclick = () => remove(ref(db, `fbPages/${key}`));
+          row.appendChild(delBtn);
+          pagesListContainer.appendChild(row);
+
+          const label = document.createElement("label");
+          label.className = "checkbox-row";
+          label.innerHTML = `
+            <input type="checkbox" class="page-target-cb" value="${key}" checked />
+            <span>${page.pageName}</span>
+          `;
+          pageCheckboxesContainer.appendChild(label);
+        });
+      });
+
+      // Sync Scheduled & Completed Posts
+      onValue(ref(db, "scheduledPosts"), (snapshot) => {
+        const posts = snapshot.val() || {};
+        postsListContainer.innerHTML = "";
+
+        const entries = Object.entries(posts).reverse();
+        if (entries.length === 0) {
+          postsListContainer.innerHTML = "<small>No posts in queue yet.</small>";
+          return;
+        }
+
+        entries.forEach(([postId, post]) => {
+          const row = document.createElement("div");
+          row.className = "list-item";
+          const timeText = new Date(post.scheduledTime).toLocaleString();
+          row.innerHTML = `
+            <div class="item-left">
+              <img src="${post.imageUrl}" class="thumb" alt="Post" />
+              <div>
+                <strong>${post.caption || "(No caption)"}</strong><br />
+                <small>Time: ${timeText} • ${post.targetPages?.length || 0} page(s)</small>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge ${post.status}">${post.status.toUpperCase()}</span>
+              <button type="button" class="btn-danger" data-del="${postId}">X</button>
+            </div>
+          `;
+          row.querySelector("[data-del]").onclick = () => remove(ref(db, `scheduledPosts/${postId}`));
+          postsListContainer.appendChild(row);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

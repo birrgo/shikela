@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Number call me Know</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#6D28D9',
+                            primaryHover: '#5B21B6',
+                            primaryLight: '#EDE9FE',
+                            surface: '#FFFFFF',
+                            subtle: '#F8FAFC',
+                            border: '#E2E8F0',
+                        }
+                    },
+                    aspectRatio: {
+                        '9/16': '9 / 16',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .btn-bounce {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.97);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 6s linear infinite;
+        }
+        .coverflow-container {
+            scroll-snap-type: x mandatory;
+            scroll-padding: 0 1rem;
+        }
+        .coverflow-item {
+            scroll-snap-align: center;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease, box-shadow 0.4s ease;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-100 text-slate-900 min-h-screen flex items-center justify-center p-0 sm:p-4 selection:bg-brand-primary selection:text-white overflow-hidden">
+
+    <!-- Screen Wrapper / Outer Phone Viewport Frame -->
+    <div class="relative w-full max-w-[390px] h-screen sm:h-[844px] aspect-[9/16] bg-white sm:rounded-[36px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] border-0 sm:border-[8px] border-slate-900 flex flex-col justify-between overflow-hidden">
+
+        <!-- Top Sticky Header -->
+        <header class="bg-white/90 backdrop-blur-md border-b border-slate-100 px-5 pt-5 pb-3.5 flex items-center justify-between z-20">
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-lg font-extrabold tracking-tight text-slate-900">
+                        Hidden Bambi Habesha
+                    </h1>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                        LIVE
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">Curated 20 Video Collection</p>
+            </div>
+            
+            <!-- Clean HD Badge -->
+            <div class="relative w-9 h-9 flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full border border-dashed border-brand-primary/40 animate-spin-slow"></div>
+                <div class="w-7 h-7 rounded-full bg-brand-primaryLight text-brand-primary flex items-center justify-center text-[10px] font-extrabold tracking-tight">
+                    HD
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div id="scroll-container" class="flex-1 w-full flex flex-col justify-start px-4 py-4 overflow-y-auto no-scrollbar relative z-10 bg-slate-50/50">
+            
+            <!-- Featured Coverflow Carousel -->
+            <div class="w-full mb-5 relative">
+                <div class="flex items-center justify-between px-1 mb-1">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Featured Spotlights</span>
+                    <span class="text-[11px] font-medium text-brand-primary">Swipe &rarr;</span>
+                </div>
+
+                <div id="carousel" class="coverflow-container flex gap-3 overflow-x-auto no-scrollbar py-3 px-6 items-center">
+                    
+                    <!-- Spotlight Item 1 -->
+                    <a data-redirect-link class="coverflow-item flex-shrink-0 w-[135px] h-[180px] rounded-2xl overflow-hidden relative group shadow-md border border-slate-200 bg-slate-200 block transform scale-90 opacity-75">
+                        <img src="1.png" alt="Spotlight 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://picsum.photos/300/400?random=1';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+                        <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[10px] font-bold text-amber-500 shadow-sm">★</div>
+                        <div class="absolute bottom-2.5 left-2.5 right-2.5 text-left">
+                            <span class="text-xs text-white font-bold block truncate">Spotlight 01</span>
+                            <span class="text-[10px] text-slate-300 font-medium">9.1 • 1080p</span>
+                        </div>
+                    </a>
+
+                    <!-- Spotlight Item 2 -->
+                    <a data-redirect-link class="coverflow-item flex-shrink-0 w-[135px] h-[180px] rounded-2xl overflow-hidden relative group shadow-md border border-slate-200 bg-slate-200 block transform scale-90 opacity-75">
+                        <img src="2.png" alt="Spotlight 2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://picsum.photos/300/400?random=2';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+                        <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[10px] font-bold text-amber-500 shadow-sm">★</div>
+                        <div class="absolute bottom-2.5 left-2.5 right-2.5 text-left">
+                            <span class="text-xs text-white font-bold block truncate">Spotlight 02</span>
+                            <span class="text-[10px] text-slate-300 font-medium">8.8 • 1080p</span>
+                        </div>
+                    </a>
+
+                    <!-- Spotlight Item 3 (Center Feature) -->
+                    <a data-redirect-link class="coverflow-item active-center flex-shrink-0 w-[150px] h-[200px] rounded-2xl overflow-hidden relative group shadow-xl border-2 border-brand-primary bg-slate-200 block transform scale-105 opacity-100">
+                        <img src="3.png" alt="Spotlight 3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://picsum.photos/300/400?random=3';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/20 to-transparent"></div>
+                        <div class="absolute top-2.5 left-2.5 bg-brand-primary px-2 py-0.5 rounded-md text-[9px] font-bold text-white uppercase tracking-wider shadow-sm">
+                            Trending
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 text-left">
+                            <span class="text-xs text-white font-extrabold block truncate">Interstellar Vault</span>
+                            <span class="text-[10px] text-purple-200 font-semibold">9.5 • Featured</span>
+                        </div>
+                    </a>
+
+                    <!-- Spotlight Item 4 -->
+                    <a data-redirect-link class="coverflow-item flex-shrink-0 w-[135px] h-[180px] rounded-2xl overflow-hidden relative group shadow-md border border-slate-200 bg-slate-200 block transform scale-90 opacity-75">
+                        <img src="4.png" alt="Spotlight 4" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://picsum.photos/300/400?random=4';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+                        <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[10px] font-bold text-amber-500 shadow-sm">★</div>
+                        <div class="absolute bottom-2.5 left-2.5 right-2.5 text-left">
+                            <span class="text-xs text-white font-bold block truncate">Spotlight 04</span>
+                            <span class="text-[10px] text-slate-300 font-medium">8.9 • 1080p</span>
+                        </div>
+                    </a>
+
+                    <!-- Spotlight Item 5 -->
+                    <a data-redirect-link class="coverflow-item flex-shrink-0 w-[135px] h-[180px] rounded-2xl overflow-hidden relative group shadow-md border border-slate-200 bg-slate-200 block transform scale-90 opacity-75">
+                        <img src="5.png" alt="Spotlight 5" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://picsum.photos/300/400?random=5';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+                        <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[10px] font-bold text-amber-500 shadow-sm">★</div>
+                        <div class="absolute bottom-2.5 left-2.5 right-2.5 text-left">
+                            <span class="text-xs text-white font-bold block truncate">Spotlight 05</span>
+                            <span class="text-[10px] text-slate-300 font-medium">9.0 • 1080p</span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- Section Header -->
+            <div class="flex items-center justify-between mb-3 px-1">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">All Videos (20)</h2>
+                <span class="text-[11px] font-semibold text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200">1080p HD</span>
+            </div>
+
+            <!-- 20 Square Video Cards Grid (Generated cleanly via JS or static) -->
+            <div id="video-grid" class="grid grid-cols-2 gap-3.5 mb-5"></div>
+
+            <!-- Security Info Card -->
+            <div class="w-full bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-xs font-semibold text-slate-800">Encrypted Stream</p>
+                        <p class="text-[11px] text-slate-500">Verified private connection</p>
+                    </div>
+                </div>
+                <button onclick="openModal()" class="text-xs font-semibold text-brand-primary hover:text-brand-primaryHover underline focus:outline-none">
+                    Details
+                </button>
+            </div>
+
+            <!-- Primary CTA Button -->
+            <a data-redirect-link class="btn-bounce w-full py-3.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-bold text-sm rounded-xl shadow-md shadow-purple-600/20 tracking-wide text-center block focus:outline-none transition-all mb-3">
+                Play All Featured Videos
+            </a>
+
+        </div>
+
+        <!-- Clean Light Security Modal -->
+        <div id="modal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center opacity-0 pointer-events-none transition-all duration-300">
+            <div id="modal-content" class="bg-white rounded-t-3xl w-full p-6 text-left shadow-2xl transform translate-y-full transition-all duration-300 border-t border-slate-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 bg-brand-primaryLight text-brand-primary rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-colors focus:outline-none">
+                        &#x2715;
+                    </button>
+                </div>
+                <h3 class="text-base font-bold text-slate-900 mb-1.5">Connection & Stream Security</h3>
+                <p class="text-xs text-slate-500 leading-relaxed mb-5">
+                    All video thumbnails and playback actions route through verified, encrypted streaming endpoints for fast HD delivery.
+                </p>
+                <button onclick="closeModal()" class="btn-bounce w-full py-3 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-colors text-sm">
+                    Got It
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Single source of truth for the redirect URL
+        const REDIRECT_URL = 'https://uplcm.com/4/10924478';
+
+        // 1. Render 20 Square Video Cards ("Before Video" Preview Style)
+        const videos = [
+            { id: 1, img: '1.png', duration: '01:45', views: '1.5M' },
+            { id: 2, img: '2.png', duration: '02:30', views: '2M' },
+            { id: 3, img: '3.png', duration: '03:12', views: '3M' },
+            { id: 4, img: '4.png', duration: '04:05', views: '2.2M' },
+            { id: 5, img: '5.png', duration: '01:50', views: '1.8M' },
+            { id: 6, img: '6.png', duration: '05:20', views: '3.4M' },
+            { id: 7, img: '1.png', duration: '02:15', views: '1.6M' },
+            { id: 8, img: '2.png', duration: '03:40', views: '2.5M' },
+            { id: 9, img: '3.png', duration: '01:10', views: '1.2M' },
+            { id: 10, img: '4.png', duration: '04:55', views: '2.8M' },
+            { id: 11, img: '5.png', duration: '02:50', views: '1.9M' },
+            { id: 12, img: '6.png', duration: '03:05', views: '2.1M' },
+            { id: 13, img: '1.png', duration: '01:25', views: '1.4M' },
+            { id: 14, img: '2.png', duration: '05:12', views: '3.6M' },
+            { id: 15, img: '3.png', duration: '02:40', views: '1.7M' },
+            { id: 16, img: '4.png', duration: '03:30', views: '2.3M' },
+            { id: 17, img: '5.png', duration: '01:55', views: '1.5M' },
+            { id: 18, img: '6.png', duration: '04:20', views: '2.7M' },
+            { id: 19, img: '1.png', duration: '02:25', views: '1.9M' },
+            { id: 20, img: '2.png', duration: '03:50', views: '2.4M' }
+        ];
+
+        const gridContainer = document.getElementById('video-grid');
+        gridContainer.innerHTML = videos.map(v => `
+            <a data-redirect-link class="group bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-brand-primary/40 transition-all flex flex-col btn-bounce">
+                <!-- 1:1 Square Thumbnail Box -->
+                <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100 mb-2.5">
+                    <img src="${v.img}" alt="Secret Video ${v.id}" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                         onerror="this.onerror=null; this.src='https://picsum.photos/300/300?random=${v.id + 10}';">
+                    
+                    <!-- Subtle Dark Overlay for Contrast -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/10"></div>
+                    
+                    <!-- Top Left HD Tag -->
+                    <span class="absolute top-2 left-2 bg-white/90 backdrop-blur-xs text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow-xs">
+                        HD
+                    </span>
+
+                    <!-- Center Play Button -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-10 h-10 bg-white/95 group-hover:bg-brand-primary text-brand-primary group-hover:text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-110">
+                            <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Duration Pill -->
+                    <span class="absolute bottom-2 right-2 bg-slate-900/80 backdrop-blur-xs text-[10px] text-white px-1.5 py-0.5 rounded font-medium">
+                        ${v.duration}
+                    </span>
+                </div>
+
+                <!-- Card Footer Metadata -->
+                <div class="px-1 pb-0.5 flex flex-col">
+                    <span class="text-xs font-bold text-slate-800 group-hover:text-brand-primary transition-colors truncate">
+                        Secret Video #${String(v.id).padStart(2, '0')}
+                    </span>
+                    <div class="flex items-center justify-between mt-0.5">
+                        <span class="text-[10px] text-slate-400 font-medium">${v.views} views</span>
+                        <span class="text-[10px] font-semibold text-brand-primary">Watch &rarr;</span>
+                    </div>
+                </div>
+            </a>
+        `).join('');
+
+        // Apply REDIRECT_URL once to every link on the page
+        document.querySelectorAll('a[data-redirect-link]').forEach(link => {
+            link.href = REDIRECT_URL;
+        });
+
+        // 2. Dynamic Coverflow Scaling & Auto-Scroll
+        const carousel = document.getElementById('carousel');
+        const items = carousel.querySelectorAll('.coverflow-item');
+
+        function updateCoverflow() {
+            const containerRect = carousel.getBoundingClientRect();
+            const containerCenter = containerRect.left + containerRect.width / 2;
+
+            items.forEach(item => {
+                const itemRect = item.getBoundingClientRect();
+                const itemCenter = itemRect.left + itemRect.width / 2;
+                const distance = Math.abs(containerCenter - itemCenter);
+                
+                if (distance < 90) {
+                    item.style.transform = 'scale(1.06)';
+                    item.style.opacity = '1';
+                    item.style.zIndex = '20';
+                    item.style.borderColor = '#6D28D9';
+                } else if (distance < 180) {
+                    item.style.transform = 'scale(0.94)';
+                    item.style.opacity = '0.85';
+                    item.style.zIndex = '10';
+                    item.style.borderColor = '#CBD5E1';
+                } else {
+                    item.style.transform = 'scale(0.86)';
+                    item.style.opacity = '0.65';
+                    item.style.zIndex = '1';
+                    item.style.borderColor = '#E2E8F0';
+                }
+            });
+        }
+
+        carousel.addEventListener('scroll', updateCoverflow);
+        window.addEventListener('load', () => {
+            const centerItem = items[2];
+            centerItem.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            setTimeout(updateCoverflow, 100);
+        });
+
+        setInterval(() => {
+            if (!carousel.matches(':hover')) {
+                carousel.scrollBy({ left: 145, behavior: 'smooth' });
+                if (carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10) {
+                    carousel.scrollTo({ left: 0, behavior: 'smooth' });
+                }
+            }
+        }, 3500);
+
+        // 3. Modal Controls
+        function openModal() {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('translate-y-full');
+            modalContent.classList.add('translate-y-0');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            modalContent.classList.remove('translate-y-0');
+            modalContent.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }, 200);
+        }
+    </script>
+</body>
+</html>
